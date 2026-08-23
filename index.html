@@ -1,0 +1,638 @@
+<title>Sightlines</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E7EBE8; --panel:#F5F7F5; --panel-2:#DFE5E1;
+  --sq-light:#F3F6F3; --sq-dark:#DCE3DE;
+  --ink:#131A1B; --ink-2:#46534F; --ink-3:#7A8783;
+  --rule:#B8C3BD; --rule-hard:#131A1B;
+  --brass:#9A6B10; --brass-soft:#E8D7A8;
+  --sight:#0C6F6E; --sight-soft:#BCDDDA;
+  --danger:#B03A32; --danger-soft:#F0CFCB;
+  --good:#2E6B45;
+  --shadow:0 1px 2px rgba(19,26,27,.08),0 8px 24px -12px rgba(19,26,27,.25);
+  --f-display:"Bodoni Moda",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --f-chess:"Noto Sans Symbols 2","Segoe UI Symbol","Apple Symbols","DejaVu Sans",sans-serif;
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1517; --panel:#161E20; --panel-2:#1E282A;
+    --sq-light:#1D2629; --sq-dark:#151D1F;
+    --ink:#E7EEEB; --ink-2:#9AAAA5; --ink-3:#697A76;
+    --rule:#2B393B; --rule-hard:#9DB1AB;
+    --brass:#D8AC4A; --brass-soft:#4A3A15;
+    --sight:#3FBFBC; --sight-soft:#173C3D;
+    --danger:#E0736A; --danger-soft:#43211E;
+    --good:#63B98A;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1517; --panel:#161E20; --panel-2:#1E282A;
+  --sq-light:#1D2629; --sq-dark:#151D1F;
+  --ink:#E7EEEB; --ink-2:#9AAAA5; --ink-3:#697A76;
+  --rule:#2B393B; --rule-hard:#9DB1AB;
+  --brass:#D8AC4A; --brass-soft:#4A3A15;
+  --sight:#3FBFBC; --sight-soft:#173C3D;
+  --danger:#E0736A; --danger-soft:#43211E;
+  --good:#63B98A;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--f-body); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px; margin:0 auto; padding:28px 20px 64px}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex; align-items:flex-end; justify-content:space-between; gap:20px;
+  border-bottom:1px solid var(--rule); padding-bottom:14px; margin-bottom:24px; flex-wrap:wrap}
+h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px);
+  line-height:1; margin:0; letter-spacing:-.01em}
+.sub{font-family:var(--f-mono); font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-3); margin-top:8px}
+.theme-btn{font-family:var(--f-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  background:none; border:1px solid var(--rule); color:var(--ink-2); padding:7px 12px;
+  border-radius:2px; cursor:pointer}
+.theme-btn:hover{border-color:var(--ink-3); color:var(--ink)}
+
+/* ---------- layout ---------- */
+.main{display:grid; grid-template-columns:minmax(0,1fr) 316px; gap:28px; align-items:start}
+@media (max-width:900px){ .main{grid-template-columns:minmax(0,1fr)} }
+
+/* ---------- board ---------- */
+.board-panel{display:flex; flex-direction:column; gap:14px; align-items:center}
+.board-frame{display:grid; grid-template-columns:22px minmax(0,1fr);
+  grid-template-rows:auto auto; width:100%; max-width:562px}
+.board-stack{position:relative; grid-column:2}
+.board-grid{
+  position:relative; display:grid; grid-template-columns:repeat(6,1fr); aspect-ratio:1;
+  border:2px solid var(--rule-hard); background:var(--rule-hard); gap:0; box-shadow:var(--shadow);
+}
+.cell{
+  position:relative; border:0; padding:0; margin:0; cursor:pointer; background:var(--sq-light);
+  display:flex; align-items:center; justify-content:center; font-family:var(--f-chess);
+  color:var(--ink); transition:background .12s ease;
+  box-shadow:inset -0.5px 0 0 var(--rule), inset 0 -0.5px 0 var(--rule);
+}
+.cell.dk{background:var(--sq-dark)}
+.cell.bx-r{box-shadow:inset -2px 0 0 var(--rule-hard), inset 0 -0.5px 0 var(--rule)}
+.cell.bx-b{box-shadow:inset -0.5px 0 0 var(--rule), inset 0 -2px 0 var(--rule-hard)}
+.cell.bx-r.bx-b{box-shadow:inset -2px 0 0 var(--rule-hard), inset 0 -2px 0 var(--rule-hard)}
+.cell:focus-visible{outline:none}
+.cell .pc{font-size:min(9vw,44px); line-height:1; pointer-events:none;
+  transform:translateY(-1px); transition:transform .1s ease}
+.cell.given .pc{color:var(--ink)}
+.cell.mine .pc{color:var(--brass)}
+.cell.sel{background:var(--brass-soft)}
+.cell.sight{background:var(--sight-soft)}
+.cell.sel.sight{background:var(--brass-soft)}
+.cell.hit{background:var(--danger-soft)}
+.cell.bad .pc{color:var(--danger)}
+.cell.bad::after{content:""; position:absolute; inset:3px; border:1.5px solid var(--danger);
+  border-radius:1px; pointer-events:none}
+.cell.peek .pc{opacity:.42; font-style:normal}
+.cell .cands{display:grid; grid-template-columns:repeat(3,1fr); gap:0; width:100%; height:100%;
+  padding:4px; pointer-events:none}
+.cell .cands span{display:flex; align-items:center; justify-content:center;
+  font-size:min(2.6vw,13px); color:var(--ink-3); line-height:1}
+.rays{position:absolute; inset:0; pointer-events:none; width:100%; height:100%}
+.ray{stroke:var(--sight); stroke-width:2.5; fill:none; opacity:.85;
+  stroke-dasharray:var(--len); stroke-dashoffset:var(--len); animation:draw .32s ease forwards}
+.ray.bad{stroke:var(--danger)}
+.dot{fill:none; stroke:var(--sight); stroke-width:2.5; opacity:.9}
+.dot.bad{stroke:var(--danger)}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){ .ray{animation:none; stroke-dashoffset:0} }
+
+.coords-f,.coords-r{font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3);
+  letter-spacing:.08em; display:grid}
+.coords-f{grid-template-columns:repeat(6,1fr); text-align:center; padding-top:6px;
+  grid-column:2}
+.coords-r{grid-template-rows:repeat(6,1fr); align-items:center; text-align:right;
+  padding-right:7px; grid-column:1; grid-row:1}
+
+/* ---------- palette ---------- */
+.palette{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; width:100%; max-width:562px}
+@media (max-width:560px){ .pbtn{padding:12px 0 10px} .pbtn .g{font-size:29px} }
+.pbtn{position:relative; background:var(--panel); border:1px solid var(--rule); border-radius:2px;
+  padding:9px 0 7px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px;
+  color:var(--ink); transition:border-color .12s, background .12s}
+.pbtn:hover{border-color:var(--ink-3)}
+.pbtn.on{border-color:var(--brass); background:var(--brass-soft)}
+.pbtn.done{opacity:.42}
+.pbtn .g{font-family:var(--f-chess); font-size:26px; line-height:1}
+.pbtn .k{font-family:var(--f-mono); font-size:9.5px; letter-spacing:.1em; color:var(--ink-3)}
+.pbtn .left{position:absolute; top:3px; right:5px; font-family:var(--f-mono); font-size:9.5px;
+  color:var(--ink-3)}
+
+/* ---------- rail ---------- */
+.rail{display:flex; flex-direction:column; gap:16px}
+.card{background:var(--panel); border:1px solid var(--rule); border-radius:3px; padding:15px 16px}
+.card h2{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink-3); margin:0 0 11px; font-weight:500}
+.levels{display:flex; flex-direction:column; gap:6px}
+.lvl{display:flex; align-items:baseline; gap:9px; text-align:left; width:100%; cursor:pointer;
+  background:none; border:1px solid transparent; border-radius:2px; padding:7px 9px; color:var(--ink);
+  font-family:inherit; font-size:14px}
+.lvl:hover{background:var(--panel-2)}
+.lvl.on{border-color:var(--brass); background:var(--brass-soft)}
+.lvl .n{font-family:var(--f-display); font-size:16px; font-weight:600}
+.lvl .m{font-family:var(--f-mono); font-size:10px; color:var(--ink-3); margin-left:auto;
+  white-space:nowrap}
+.status{font-size:13.5px; line-height:1.5; color:var(--ink-2); min-height:3.6em}
+.status strong{color:var(--ink); font-weight:600}
+.status.err strong{color:var(--danger)}
+.status.win{color:var(--good)}
+.stats{display:flex; gap:16px; font-family:var(--f-mono); font-size:12px; color:var(--ink-2);
+  font-variant-numeric:tabular-nums; border-top:1px solid var(--rule); margin-top:11px; padding-top:10px}
+.stats b{color:var(--ink); font-weight:500}
+.btns{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.btn{font-family:var(--f-body); font-size:13px; background:var(--panel-2); color:var(--ink);
+  border:1px solid var(--rule); border-radius:2px; padding:8px 6px; cursor:pointer}
+.btn:hover{border-color:var(--ink-3)}
+.btn.wide{grid-column:1/-1}
+.btn.key{background:var(--ink); color:var(--ground); border-color:var(--ink)}
+.btn.key:hover{opacity:.88}
+.toggles{display:flex; flex-direction:column; gap:8px}
+.tg{display:flex; align-items:center; gap:9px; font-size:13.5px; cursor:pointer; color:var(--ink-2)}
+.tg input{accent-color:var(--sight); width:15px; height:15px; margin:0; cursor:pointer}
+:focus-visible{outline:2px solid var(--sight); outline-offset:2px}
+
+/* ---------- rules ---------- */
+.rules{margin-top:34px; border-top:1px solid var(--rule); padding-top:22px}
+.rules h2{font-family:var(--f-display); font-size:23px; font-weight:600; margin:0 0 4px}
+.rules p{max-width:64ch; color:var(--ink-2); margin:0 0 16px}
+.rules p b{color:var(--ink); font-weight:600}
+.pgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:12px; margin-top:18px}
+.pcard{background:var(--panel); border:1px solid var(--rule); border-radius:3px; padding:12px 13px}
+.pcard .hd{display:flex; align-items:center; gap:8px; margin-bottom:9px}
+.pcard .hd .g{font-family:var(--f-chess); font-size:22px; line-height:1}
+.pcard .hd .nm{font-family:var(--f-display); font-size:16px; font-weight:600}
+.mini{display:grid; grid-template-columns:repeat(5,1fr); width:80px; aspect-ratio:1; gap:1px;
+  background:var(--rule); border:1px solid var(--rule); margin-bottom:8px}
+.mini i{background:var(--sq-light)}
+.mini i.s{background:var(--sight-soft)}
+.mini i.c{background:var(--brass-soft)}
+.pcard .tx{font-size:12.5px; color:var(--ink-2); line-height:1.45}
+.note{background:var(--panel); border:1px solid var(--rule); border-left:3px solid var(--brass);
+  border-radius:2px; padding:13px 15px; margin-top:22px; font-size:13.5px; color:var(--ink-2);
+  max-width:72ch}
+.note b{color:var(--ink)}
+.kbd{font-family:var(--f-mono); font-size:11px; background:var(--panel-2); border:1px solid var(--rule);
+  border-radius:2px; padding:1px 5px; color:var(--ink-2)}
+.win-banner{font-family:var(--f-display); font-size:19px; color:var(--good); font-weight:600}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <h1>Sightlines</h1>
+      <div class="sub">Chess &times; Sudoku &middot; playable prototype</div>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button">Dark</button>
+  </header>
+
+  <div class="main">
+    <section class="board-panel">
+      <div class="board-frame">
+        <div class="coords-r" id="coordsR"></div>
+        <div class="board-stack">
+          <div class="board-grid" id="board"></div>
+          <svg class="rays" id="rays" viewBox="0 0 600 600" preserveAspectRatio="none" aria-hidden="true"></svg>
+        </div>
+        <div class="coords-f" id="coordsF"></div>
+      </div>
+      <div class="palette" id="palette"></div>
+    </section>
+
+    <aside class="rail">
+      <div class="card">
+        <h2>Level</h2>
+        <div class="levels" id="levels"></div>
+      </div>
+
+      <div class="card">
+        <h2>Board talk</h2>
+        <div class="status" id="status">Pick a square, then a piece.</div>
+        <div class="stats">
+          <span>filled <b id="stFilled">0</b>/36</span>
+          <span>clues <b id="stClues">0</b></span>
+          <span id="stTime">00:00</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Tools</h2>
+        <div class="btns">
+          <button class="btn key wide" id="btnHint" type="button">Hint</button>
+          <button class="btn" id="btnUndo" type="button">Undo</button>
+          <button class="btn" id="btnClear" type="button">Reset</button>
+          <button class="btn wide" id="btnSolve" type="button">Reveal solution</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Assists</h2>
+        <div class="toggles">
+          <label class="tg"><input type="checkbox" id="tgSight" checked> Draw sight lines</label>
+          <label class="tg"><input type="checkbox" id="tgConf" checked> Flag rule breaks</label>
+          <label class="tg"><input type="checkbox" id="tgCand"> Show what still fits</label>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="rules">
+    <h2>How it plays</h2>
+    <p>Fill all 36 squares with the six chess pieces. <b>Each row, each column and each
+    2&times;3 box holds all six exactly once</b> &mdash; that is the sudoku half. The chess half:
+    <b>no piece may see another of its own kind</b>. Sight ignores whatever stands in the way,
+    so a bishop rules its whole diagonal. Different pieces never mind each other &mdash; a queen
+    is happy beside a queen&#39;s worth of knights, just not beside another queen.</p>
+    <p>Click a square and press a letter, or tap a piece below the board.
+    <span class="kbd">P</span> <span class="kbd">N</span> <span class="kbd">B</span>
+    <span class="kbd">R</span> <span class="kbd">Q</span> <span class="kbd">K</span> place;
+    <span class="kbd">1</span>&ndash;<span class="kbd">6</span> do the same; arrows move;
+    <span class="kbd">Backspace</span> clears.</p>
+
+    <div class="pgrid" id="pgrid"></div>
+
+    <div class="note" id="findings">
+      <b>A finding from the solver, worth knowing while you play.</b>
+      Because rows and columns already forbid a repeat, the <b>rook&#39;s</b> sight adds nothing at
+      all &mdash; it is the free piece. For the same reason the <b>queen</b> ends up with exactly the
+      bishop&#39;s restriction (no twin on a diagonal), and the <b>king</b> ends up with exactly the
+      pawn&#39;s (no twin diagonally touching). Three real rules do the work: diagonal touch,
+      diagonal line, knight&#39;s leap.
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const H=6, W=6, N=36;
+const PIECES=["P","N","B","R","Q","K"];
+const GLYPH={P:"♟",N:"♞",B:"♝",R:"♜",Q:"♛",K:"♚"};
+const NAME={P:"Pawn",N:"Knight",B:"Bishop",R:"Rook",Q:"Queen",K:"King"};
+const RULE={
+  P:"No twin diagonally touching &mdash; pawns capture on the diagonal.",
+  N:"No twin a knight&#39;s leap away.",
+  B:"No twin anywhere on either diagonal, at any distance.",
+  R:"Row and column, which the sudoku rule already forbids. The rook is free.",
+  Q:"No twin on a diagonal (her rank and file are already spoken for).",
+  K:"No twin on any touching square."
+};
+const LEVELS=[{"id":"opening","name":"Opening","blurb":"Every step is a single: some cell or some piece has only one home left.","technique":"singles only","clues":8,"givens":{"4":"R","20":"R","29":"B","33":"P","16":"B","13":"K","18":"Q","34":"Q"},"solution":["N","Q","K","B","R","P","B","R","P","Q","K","N","P","K","N","R","B","Q","Q","B","R","N","P","K","R","P","Q","K","N","B","K","N","B","P","Q","R"]},{"id":"middlegame","name":"Middlegame","blurb":"Needs the vision squeeze: a piece confined to a few cells still rules out squares.","technique":"vision pointing","clues":7,"givens":{"0":"K","21":"R","11":"B","8":"Q","17":"K","23":"Q","29":"R"},"solution":["K","R","B","P","Q","N","N","P","Q","K","R","B","Q","B","R","N","P","K","P","K","N","R","B","Q","B","N","P","Q","K","R","R","Q","K","B","N","P"]},{"id":"endgame","name":"Endgame","blurb":"Sparse. Chains a line/box lock together with the vision squeeze.","technique":"line/box lock","clues":5,"givens":{"0":"P","2":"N","8":"Q","34":"B","15":"R"},"solution":["P","B","N","K","Q","R","K","R","Q","B","P","N","Q","P","K","R","N","B","B","N","R","P","K","Q","N","K","B","Q","R","P","R","Q","P","N","B","K"]},{"id":"sandbox","name":"Sandbox","blurb":"Empty board. Place anything and watch the rules bite — for testing ideas.","technique":"free play","clues":0,"givens":{},"solution":null}];
+
+const rc=i=>[Math.floor(i/W), i%W];
+const id=(r,c)=>r*W+c;
+const boxOf=i=>{const[r,c]=rc(i); return Math.floor(r/2)*2+Math.floor(c/3);};
+const FILES="abcdef";
+const coord=i=>{const[r,c]=rc(i); return FILES[c]+(H-r);};
+
+function sees(p,r1,c1,r2,c2){
+  const dr=Math.abs(r2-r1), dc=Math.abs(c2-c1);
+  if(!dr&&!dc) return false;
+  switch(p){
+    case "P": return dr===1&&dc===1;
+    case "N": return (dr===1&&dc===2)||(dr===2&&dc===1);
+    case "B": return dr===dc;
+    case "R": return dr===0||dc===0;
+    case "Q": return dr===dc||dr===0||dc===0;
+    case "K": return Math.max(dr,dc)===1;
+  }
+  return false;
+}
+function sightOf(p,i){
+  const[r,c]=rc(i), out=[];
+  for(let j=0;j<N;j++){ if(j===i) continue; const[r2,c2]=rc(j);
+    if(sees(p,r,c,r2,c2)) out.push(j); }
+  return out;
+}
+const SIGHT={};
+PIECES.forEach(p=>{ SIGHT[p]=[]; for(let i=0;i<N;i++) SIGHT[p][i]=sightOf(p,i); });
+
+/* ---------- state ---------- */
+let level=LEVELS[0], grid=[], givens={}, sel=null, armed=null, undo=[],
+    t0=null, tick=null, peeking=false;
+
+function load(lv){
+  level=lv; givens={}; grid=new Array(N).fill(null); undo=[]; sel=null; armed=null; peeking=false;
+  Object.keys(lv.givens).forEach(k=>{ givens[+k]=lv.givens[k]; grid[+k]=lv.givens[k]; });
+  t0=null; if(tick){clearInterval(tick); tick=null;} el("stTime").textContent="00:00";
+  say(lv.blurb);
+  drawLevels(); render();
+}
+function el(x){ return document.getElementById(x); }
+function startClock(){
+  if(t0||level.id==="sandbox") return;
+  t0=Date.now();
+  tick=setInterval(()=>{
+    const s=Math.floor((Date.now()-t0)/1000);
+    el("stTime").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+  },1000);
+}
+
+/* ---------- rules engine ---------- */
+function conflicts(){
+  const bad=new Set(), msgs=[];
+  for(let i=0;i<N;i++){
+    const p=grid[i]; if(!p) continue;
+    const[r1,c1]=rc(i);
+    for(let j=i+1;j<N;j++){
+      if(grid[j]!==p) continue;
+      const[r2,c2]=rc(j);
+      let why=null;
+      if(r1===r2) why="share rank "+(H-r1);
+      else if(c1===c2) why="share file "+FILES[c1];
+      else if(boxOf(i)===boxOf(j)) why="sit in one box";
+      else if(sees(p,r1,c1,r2,c2)) why="see each other";
+      if(why){ bad.add(i); bad.add(j);
+        msgs.push("The "+NAME[p].toLowerCase()+"s on <strong>"+coord(i)+"</strong> and <strong>"+
+                  coord(j)+"</strong> "+why+"."); }
+    }
+  }
+  return {bad, msgs};
+}
+function candidates(i){
+  if(grid[i]) return [];
+  const[r,c]=rc(i), b=boxOf(i);
+  return PIECES.filter(p=>{
+    for(let j=0;j<N;j++){
+      if(j===i||grid[j]!==p) continue;
+      const[r2,c2]=rc(j);
+      if(r2===r||c2===c||boxOf(j)===b||sees(p,r,c,r2,c2)) return false;
+    }
+    return true;
+  });
+}
+const UNITS=(()=>{
+  const u=[];
+  for(let r=0;r<H;r++) u.push({name:"rank "+(H-r), cells:Array.from({length:W},(_,c)=>id(r,c))});
+  for(let c=0;c<W;c++) u.push({name:"file "+FILES[c], cells:Array.from({length:H},(_,r)=>id(r,c))});
+  for(let b=0;b<6;b++) u.push({name:"box "+(b+1),
+    cells:Array.from({length:N},(_,i)=>i).filter(i=>boxOf(i)===b)});
+  return u;
+})();
+
+/* ---------- rendering ---------- */
+const board=el("board"), rays=el("rays");
+function buildBoard(){
+  board.innerHTML="";
+  for(let i=0;i<N;i++){
+    const[r,c]=rc(i);
+    const b=document.createElement("button");
+    b.type="button"; b.className="cell"+((r+c)%2?" dk":"")+
+      (c%3===2&&c<W-1?" bx-r":"")+(r%2===1&&r<H-1?" bx-b":"");
+    b.dataset.i=i; b.setAttribute("aria-label","square "+coord(i));
+    b.addEventListener("click",()=>onCell(i));
+    b.addEventListener("mouseenter",()=>{ if(sel===null) preview(i); });
+    b.addEventListener("mouseleave",()=>{ if(sel===null) preview(null); });
+    board.appendChild(b);
+  }
+  el("coordsF").innerHTML=[...FILES].map(f=>"<span>"+f+"</span>").join("");
+  el("coordsR").innerHTML=Array.from({length:H},(_,r)=>"<span>"+(H-r)+"</span>").join("");
+}
+function preview(i){ hoverCell=i; render(); }
+let hoverCell=null;
+
+function render(){
+  const {bad,msgs}=conflicts();
+  const showConf=el("tgConf").checked, showCand=el("tgCand").checked;
+  const focus = sel!==null ? sel : hoverCell;
+  let lit=new Set(), hits=new Set(), litPiece=null, litFrom=null;
+  if(el("tgSight").checked && focus!==null){
+    const p = grid[focus] || armed;
+    if(p){ litPiece=p; litFrom=focus;
+      SIGHT[p][focus].forEach(j=>{ lit.add(j); if(grid[j]===p) hits.add(j); }); }
+  }
+  let filled=0;
+  for(let i=0;i<N;i++){
+    const cell=board.children[i], p=grid[i];
+    if(p) filled++;
+    cell.className="cell"+((rc(i)[0]+rc(i)[1])%2?" dk":"")+
+      (rc(i)[1]%3===2&&rc(i)[1]<W-1?" bx-r":"")+(rc(i)[0]%2===1&&rc(i)[0]<H-1?" bx-b":"")+
+      (i in givens?" given":p?" mine":"")+
+      (i===sel?" sel":"")+(lit.has(i)?" sight":"")+(hits.has(i)?" hit":"")+
+      (showConf&&bad.has(i)?" bad":"")+(peeking&&!(i in givens)?" peek":"");
+    if(p) cell.innerHTML='<span class="pc">'+GLYPH[p]+"</span>";
+    else if(showCand){
+      const cd=candidates(i);
+      cell.innerHTML='<span class="cands">'+PIECES.map(x=>
+        "<span>"+(cd.includes(x)?GLYPH[x]:"")+"</span>").join("")+"</span>";
+    } else cell.innerHTML="";
+  }
+  drawRays(litPiece, litFrom, lit, hits);
+  el("stFilled").textContent=filled;
+  el("stClues").textContent=Object.keys(givens).length;
+  drawPalette();
+
+  if(filled===N && bad.size===0){
+    if(tick){clearInterval(tick); tick=null;}
+    say('<span class="win-banner">Solved.</span> Every rank, file and box holds all six, '+
+        "and no piece sees its twin.", "win");
+  } else if(showConf && msgs.length){
+    say(msgs[0]+(msgs.length>1?" <em>(+"+(msgs.length-1)+" more)</em>":""),"err");
+  }
+}
+function drawRays(p,from,lit,hits){
+  rays.innerHTML="";
+  if(!p||from===null||from===undefined) return;
+  const[r,c]=rc(from), cx=c*100+50, cy=r*100+50;
+  const slider=(p==="B"||p==="R"||p==="Q");
+  const svgns="http://www.w3.org/2000/svg";
+  if(slider){
+    const dirs=[];
+    if(p!=="B") dirs.push([0,1],[0,-1],[1,0],[-1,0]);
+    if(p!=="R") dirs.push([1,1],[1,-1],[-1,1],[-1,-1]);
+    dirs.forEach(([dr,dc])=>{
+      let rr=r,cc=c,last=null,bad=false;
+      while(true){ rr+=dr; cc+=dc;
+        if(rr<0||rr>=H||cc<0||cc>=W) break;
+        last=[rr,cc]; if(grid[id(rr,cc)]===p) bad=true; }
+      if(!last) return;
+      const x2=last[1]*100+50, y2=last[0]*100+50;
+      const ln=document.createElementNS(svgns,"line");
+      ln.setAttribute("x1",cx); ln.setAttribute("y1",cy);
+      ln.setAttribute("x2",x2); ln.setAttribute("y2",y2);
+      ln.setAttribute("class","ray"+(bad?" bad":""));
+      ln.style.setProperty("--len",Math.hypot(x2-cx,y2-cy).toFixed(1));
+      rays.appendChild(ln);
+    });
+  } else {
+    lit.forEach(j=>{
+      const[r2,c2]=rc(j);
+      const ci=document.createElementNS(svgns,"circle");
+      ci.setAttribute("cx",c2*100+50); ci.setAttribute("cy",r2*100+50);
+      ci.setAttribute("r",34); ci.setAttribute("class","dot"+(hits.has(j)?" bad":""));
+      rays.appendChild(ci);
+    });
+  }
+}
+function drawPalette(){
+  const pal=el("palette");
+  if(!pal.children.length){
+    PIECES.forEach(p=>{
+      const b=document.createElement("button");
+      b.type="button"; b.dataset.p=p;
+      b.innerHTML='<span class="left"></span><span class="g">'+GLYPH[p]+
+                  '</span><span class="k">'+p+"</span>";
+      b.addEventListener("click",()=>{ armed=(armed===p?null:p);
+        if(sel!==null&&armed) place(sel,armed); else render(); });
+      pal.appendChild(b);
+    });
+  }
+  [...pal.children].forEach(b=>{
+    const p=b.dataset.p, used=grid.filter(x=>x===p).length;
+    b.className="pbtn"+(armed===p?" on":"")+(used>=6?" done":"");
+    b.querySelector(".left").textContent=(6-used)+"×";
+  });
+}
+function say(html,cls){ const s=el("status"); s.className="status"+(cls?" "+cls:""); s.innerHTML=html; }
+
+/* ---------- interaction ---------- */
+function onCell(i){
+  if(i in givens){ sel=i; armed=null; say("<strong>"+coord(i)+"</strong> is a clue &mdash; "+
+      NAME[givens[i]].toLowerCase()+", fixed."); render(); return; }
+  if(armed){ place(i,armed); return; }
+  sel=(sel===i?null:i);
+  if(sel!==null){
+    const cd=candidates(i);
+    say(cd.length? "<strong>"+coord(i)+"</strong> still takes "+
+        cd.map(p=>NAME[p].toLowerCase()).join(", ")+"."
+      : "<strong>"+coord(i)+"</strong> has nothing left that fits &mdash; something earlier is wrong.");
+  }
+  render();
+}
+function place(i,p){
+  if(i in givens) return;
+  undo.push({i, prev:grid[i]});
+  grid[i]=(grid[i]===p?null:p);
+  sel=i; startClock(); peeking=false;
+  const cf=conflicts();
+  if(!cf.bad.has(i)) say(grid[i]? NAME[p]+" to <strong>"+coord(i)+"</strong>." :
+                                  "<strong>"+coord(i)+"</strong> cleared.");
+  render();
+}
+function clearCell(i){ if(i in givens||!grid[i]) return;
+  undo.push({i,prev:grid[i]}); grid[i]=null; render(); }
+
+document.addEventListener("keydown",e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const k=e.key.toUpperCase();
+  if(sel===null&&["ARROWUP","ARROWDOWN","ARROWLEFT","ARROWRIGHT"].includes(k)) sel=0;
+  else if(sel!==null){
+    let[r,c]=rc(sel), moved=true;
+    if(k==="ARROWUP") r=(r+H-1)%H; else if(k==="ARROWDOWN") r=(r+1)%H;
+    else if(k==="ARROWLEFT") c=(c+W-1)%W; else if(k==="ARROWRIGHT") c=(c+1)%W;
+    else moved=false;
+    if(moved){ sel=id(r,c); e.preventDefault(); render(); return; }
+  }
+  if(sel===null) return;
+  if(PIECES.includes(k)){ place(sel,k); e.preventDefault(); }
+  else if("123456".includes(k)){ place(sel,PIECES[+k-1]); e.preventDefault(); }
+  else if(k==="BACKSPACE"||k==="DELETE"){ clearCell(sel); e.preventDefault(); }
+  else if(k==="ESCAPE"){ sel=null; armed=null; render(); }
+});
+
+/* ---------- hint ---------- */
+function hint(){
+  if(level.solution){
+    const wrong=grid.findIndex((p,i)=>p&&!(i in givens)&&p!==level.solution[i]);
+    if(wrong>=0){ sel=wrong;
+      say("Before anything else: the piece on <strong>"+coord(wrong)+
+          "</strong> cannot be right. Take it off.","err"); render(); return; }
+  }
+  for(let i=0;i<N;i++){
+    if(grid[i]) continue;
+    const cd=candidates(i);
+    if(cd.length===1){ sel=i;
+      say("Only one piece still fits <strong>"+coord(i)+"</strong>: the "+
+          NAME[cd[0]].toLowerCase()+". Everything else is placed in its rank, file or box, "+
+          "or stands in its sight."); render(); return; }
+    if(cd.length===0){ sel=i;
+      say("Nothing fits <strong>"+coord(i)+"</strong> any more &mdash; an earlier piece is wrong.","err");
+      render(); return; }
+  }
+  for(const u of UNITS){
+    for(const p of PIECES){
+      if(u.cells.some(i=>grid[i]===p)) continue;
+      const spots=u.cells.filter(i=>!grid[i]&&candidates(i).includes(p));
+      if(spots.length===1){ sel=spots[0];
+        say("In <strong>"+u.name+"</strong> the "+NAME[p].toLowerCase()+
+            " has one square left: <strong>"+coord(spots[0])+"</strong>."); render(); return; }
+      if(spots.length===0){ say("The "+NAME[p].toLowerCase()+" has nowhere to go in <strong>"+
+            u.name+"</strong>. Something earlier is wrong.","err"); return; }
+    }
+  }
+  if(level.solution){
+    const empty=[];
+    for(let i=0;i<N;i++) if(!grid[i]) empty.push(i);
+    if(empty.length){ const i=empty[0]; place(i,level.solution[i]); sel=i;
+      say("No plain single left, so here is one for free: "+NAME[level.solution[i]].toLowerCase()+
+          " on <strong>"+coord(i)+"</strong>."); render(); return; }
+  }
+  say("Nothing obvious left to point at.");
+}
+
+/* ---------- chrome ---------- */
+function drawLevels(){
+  const box=el("levels"); box.innerHTML="";
+  LEVELS.forEach(lv=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="lvl"+(lv.id===level.id?" on":"");
+    b.innerHTML='<span class="n">'+lv.name+'</span><span class="m">'+
+      (lv.id==="sandbox"?"free":lv.clues+" clues")+"</span>";
+    b.addEventListener("click",()=>load(lv));
+    box.appendChild(b);
+  });
+}
+function drawPieceCards(){
+  const g=el("pgrid");
+  PIECES.forEach(p=>{
+    let mini="";
+    for(let r=0;r<5;r++) for(let c=0;c<5;c++){
+      const centre=(r===2&&c===2);
+      mini+='<i class="'+(centre?"c":(sees(p,2,2,r,c)?"s":""))+'"></i>';
+    }
+    const d=document.createElement("div");
+    d.className="pcard";
+    d.innerHTML='<div class="hd"><span class="g">'+GLYPH[p]+'</span><span class="nm">'+NAME[p]+
+      '</span></div><div class="mini">'+mini+'</div><div class="tx">'+RULE[p]+"</div>";
+    g.appendChild(d);
+  });
+}
+el("btnHint").addEventListener("click",hint);
+el("btnUndo").addEventListener("click",()=>{
+  const u=undo.pop(); if(!u){ say("Nothing to undo."); return; }
+  grid[u.i]=u.prev; sel=u.i; render();
+});
+el("btnClear").addEventListener("click",()=>load(level));
+el("btnSolve").addEventListener("click",()=>{
+  if(!level.solution){ say("The sandbox has no single answer to reveal."); return; }
+  peeking=true; grid=level.solution.slice(); if(tick){clearInterval(tick); tick=null;}
+  say("Solution shown. Hit <strong>Reset</strong> to play it yourself.");
+  render();
+});
+["tgSight","tgConf","tgCand"].forEach(t=>el(t).addEventListener("change",render));
+const themeBtn=el("themeBtn");
+themeBtn.addEventListener("click",()=>{
+  const dark=document.documentElement.getAttribute("data-theme")==="dark"||
+    (!document.documentElement.getAttribute("data-theme")&&
+     window.matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.setAttribute("data-theme",dark?"light":"dark");
+  themeBtn.textContent=dark?"Dark":"Light";
+});
+
+buildBoard(); drawPieceCards(); load(LEVELS[0]);
+})();
+</script>
