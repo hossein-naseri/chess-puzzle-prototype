@@ -44,10 +44,11 @@
 }
 
 *{box-sizing:border-box}
+button{-webkit-tap-highlight-color:transparent; touch-action:manipulation}
 body{
   margin:0; background:var(--ground); color:var(--ink);
   font-family:var(--f-body); font-size:15px; line-height:1.55;
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;
 }
 .wrap{max-width:1120px; margin:0 auto; padding:28px 20px 64px}
 
@@ -79,7 +80,7 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
 .cell{
   position:relative; border:0; padding:0; margin:0; cursor:pointer; background:var(--sq-light);
   display:flex; align-items:center; justify-content:center; font-family:var(--f-chess);
-  color:var(--ink); transition:background .12s ease;
+  color:var(--ink); transition:background .12s ease; user-select:none; -webkit-user-select:none;
   box-shadow:inset -0.5px 0 0 var(--rule), inset 0 -0.5px 0 var(--rule);
 }
 .cell.dk{background:var(--sq-dark)}
@@ -95,22 +96,19 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
 .cell.sight{background:var(--sight-soft)}
 .cell.sel.sight{background:var(--brass-soft)}
 .cell.hit{background:var(--danger-soft)}
-.cell.bad .pc{color:var(--danger)}
-.cell.bad::after{content:""; position:absolute; inset:3px; border:1.5px solid var(--danger);
-  border-radius:1px; pointer-events:none}
+.cell.bad{background:var(--danger-soft)}          /* conflict: tint the square, keep the piece its own colour */
 .cell.peek .pc{opacity:.42; font-style:normal}
 .cell .cands{display:grid; grid-template-columns:repeat(3,1fr); gap:0; width:100%; height:100%;
   padding:4px; pointer-events:none}
 .cell .cands span{display:flex; align-items:center; justify-content:center;
   font-size:min(2.6vw,13px); color:var(--ink-3); line-height:1}
 .rays{position:absolute; inset:0; pointer-events:none; width:100%; height:100%}
-.ray{stroke:var(--sight); stroke-width:2.5; fill:none; opacity:.85;
-  stroke-dasharray:var(--len); stroke-dashoffset:var(--len); animation:draw .32s ease forwards}
-.ray.bad{stroke:var(--danger)}
-.dot{fill:none; stroke:var(--sight); stroke-width:2.5; opacity:.9}
-.dot.bad{stroke:var(--danger)}
-@keyframes draw{to{stroke-dashoffset:0}}
-@media (prefers-reduced-motion:reduce){ .ray{animation:none; stroke-dashoffset:0} }
+/* one consistent marker for every piece: a small bold dot on each square it sees */
+.dot{fill:var(--sight); transform-origin:center; transform-box:fill-box;
+  animation:pop .18s ease forwards}
+.dot.bad{fill:var(--danger)}
+@keyframes pop{from{transform:scale(0)} to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){ .dot{animation:none} }
 
 .coords-f,.coords-r{font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3);
   letter-spacing:.08em; display:grid}
@@ -257,10 +255,12 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
     <b>no piece may see another of its own kind</b>. Sight ignores whatever stands in the way,
     so a bishop rules its whole diagonal. Different pieces never mind each other &mdash; a queen
     is happy beside a queen&#39;s worth of knights, just not beside another queen.</p>
-    <p>Click a square and press a letter, or tap a piece below the board.
+    <p><b>Tap a square, then tap a piece</b> below the board to place it &mdash; two taps, every
+    time. The square stays selected, so tap a different piece to swap it, or tap the same piece
+    again to clear it. On a keyboard you can also press
     <span class="kbd">P</span> <span class="kbd">N</span> <span class="kbd">B</span>
-    <span class="kbd">R</span> <span class="kbd">Q</span> <span class="kbd">K</span> place;
-    <span class="kbd">1</span>&ndash;<span class="kbd">6</span> do the same; arrows move;
+    <span class="kbd">R</span> <span class="kbd">Q</span> <span class="kbd">K</span> or
+    <span class="kbd">1</span>&ndash;<span class="kbd">6</span>; arrows move;
     <span class="kbd">Backspace</span> clears.</p>
 
     <div class="pgrid" id="pgrid"></div>
@@ -322,11 +322,11 @@ const SIGHT={};
 PIECES.forEach(p=>{ SIGHT[p]=[]; for(let i=0;i<N;i++) SIGHT[p][i]=sightOf(p,i); });
 
 /* ---------- state ---------- */
-let level=LEVELS[0], grid=[], givens={}, sel=null, armed=null, undo=[],
+let level=LEVELS[0], grid=[], givens={}, sel=null, undo=[],
     t0=null, tick=null, peeking=false;
 
 function load(lv){
-  level=lv; givens={}; grid=new Array(N).fill(null); undo=[]; sel=null; armed=null; peeking=false;
+  level=lv; givens={}; grid=new Array(N).fill(null); undo=[]; sel=null; peeking=false;
   Object.keys(lv.givens).forEach(k=>{ givens[+k]=lv.givens[k]; grid[+k]=lv.givens[k]; });
   t0=null; if(tick){clearInterval(tick); tick=null;} el("stTime").textContent="00:00";
   say(lv.blurb);
@@ -411,7 +411,7 @@ function render(){
   const focus = sel!==null ? sel : hoverCell;
   let lit=new Set(), hits=new Set(), litPiece=null, litFrom=null;
   if(el("tgSight").checked && focus!==null){
-    const p = grid[focus] || armed;
+    const p = grid[focus];
     if(p){ litPiece=p; litFrom=focus;
       SIGHT[p][focus].forEach(j=>{ lit.add(j); if(grid[j]===p) hits.add(j); }); }
   }
@@ -447,36 +447,15 @@ function render(){
 function drawRays(p,from,lit,hits){
   rays.innerHTML="";
   if(!p||from===null||from===undefined) return;
-  const[r,c]=rc(from), cx=c*100+50, cy=r*100+50;
-  const slider=(p==="B"||p==="R"||p==="Q");
   const svgns="http://www.w3.org/2000/svg";
-  if(slider){
-    const dirs=[];
-    if(p!=="B") dirs.push([0,1],[0,-1],[1,0],[-1,0]);
-    if(p!=="R") dirs.push([1,1],[1,-1],[-1,1],[-1,-1]);
-    dirs.forEach(([dr,dc])=>{
-      let rr=r,cc=c,last=null,bad=false;
-      while(true){ rr+=dr; cc+=dc;
-        if(rr<0||rr>=H||cc<0||cc>=W) break;
-        last=[rr,cc]; if(grid[id(rr,cc)]===p) bad=true; }
-      if(!last) return;
-      const x2=last[1]*100+50, y2=last[0]*100+50;
-      const ln=document.createElementNS(svgns,"line");
-      ln.setAttribute("x1",cx); ln.setAttribute("y1",cy);
-      ln.setAttribute("x2",x2); ln.setAttribute("y2",y2);
-      ln.setAttribute("class","ray"+(bad?" bad":""));
-      ln.style.setProperty("--len",Math.hypot(x2-cx,y2-cy).toFixed(1));
-      rays.appendChild(ln);
-    });
-  } else {
-    lit.forEach(j=>{
-      const[r2,c2]=rc(j);
-      const ci=document.createElementNS(svgns,"circle");
-      ci.setAttribute("cx",c2*100+50); ci.setAttribute("cy",r2*100+50);
-      ci.setAttribute("r",34); ci.setAttribute("class","dot"+(hits.has(j)?" bad":""));
-      rays.appendChild(ci);
-    });
-  }
+  // one marker style for every piece: a small bold dot on each square it sees
+  lit.forEach(j=>{
+    const[r2,c2]=rc(j);
+    const ci=document.createElementNS(svgns,"circle");
+    ci.setAttribute("cx",c2*100+50); ci.setAttribute("cy",r2*100+50);
+    ci.setAttribute("r",9); ci.setAttribute("class","dot"+(hits.has(j)?" bad":""));
+    rays.appendChild(ci);
+  });
 }
 function drawPalette(){
   const pal=el("palette");
@@ -486,14 +465,13 @@ function drawPalette(){
       b.type="button"; b.dataset.p=p;
       b.innerHTML='<span class="left"></span><span class="g">'+GLYPH[p]+
                   '</span><span class="k">'+p+"</span>";
-      b.addEventListener("click",()=>{ armed=(armed===p?null:p);
-        if(sel!==null&&armed) place(sel,armed); else render(); });
+      b.addEventListener("click",()=>onPiece(p));
       pal.appendChild(b);
     });
   }
   [...pal.children].forEach(b=>{
     const p=b.dataset.p, used=grid.filter(x=>x===p).length;
-    b.className="pbtn"+(armed===p?" on":"")+(used>=6?" done":"");
+    b.className="pbtn"+(used>=6?" done":"");
     b.querySelector(".left").textContent=(6-used)+"×";
   });
 }
@@ -501,17 +479,23 @@ function say(html,cls){ const s=el("status"); s.className="status"+(cls?" "+cls:
 
 /* ---------- interaction ---------- */
 function onCell(i){
-  if(i in givens){ sel=i; armed=null; say("<strong>"+coord(i)+"</strong> is a clue &mdash; "+
+  if(i in givens){ sel=i; say("<strong>"+coord(i)+"</strong> is a clue &mdash; "+
       NAME[givens[i]].toLowerCase()+", fixed."); render(); return; }
-  if(armed){ place(i,armed); return; }
   sel=(sel===i?null:i);
   if(sel!==null){
     const cd=candidates(i);
-    say(cd.length? "<strong>"+coord(i)+"</strong> still takes "+
-        cd.map(p=>NAME[p].toLowerCase()).join(", ")+"."
+    say(cd.length? "<strong>"+coord(i)+"</strong> selected &mdash; tap a piece to place it. "+
+        "Still fits: "+cd.map(p=>NAME[p].toLowerCase()).join(", ")+"."
       : "<strong>"+coord(i)+"</strong> has nothing left that fits &mdash; something earlier is wrong.");
   }
   render();
+}
+// tapping a piece places it in the selected square straight away (no toggle, no arming)
+function onPiece(p){
+  if(sel===null){ say("Tap a square first, then tap a piece to place it."); return; }
+  if(sel in givens){ say("<strong>"+coord(sel)+"</strong> is a fixed clue &mdash; pick an empty square.");
+    return; }
+  place(sel,p);
 }
 function place(i,p){
   if(i in givens) return;
@@ -541,7 +525,7 @@ document.addEventListener("keydown",e=>{
   if(PIECES.includes(k)){ place(sel,k); e.preventDefault(); }
   else if("123456".includes(k)){ place(sel,PIECES[+k-1]); e.preventDefault(); }
   else if(k==="BACKSPACE"||k==="DELETE"){ clearCell(sel); e.preventDefault(); }
-  else if(k==="ESCAPE"){ sel=null; armed=null; render(); }
+  else if(k==="ESCAPE"){ sel=null; render(); }
 });
 
 /* ---------- hint ---------- */
