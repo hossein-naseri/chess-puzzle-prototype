@@ -10,7 +10,7 @@
   --brass:#9A6B10; --brass-soft:#E8D7A8;
   --sight:#0C6F6E; --sight-soft:#BCDDDA;
   --danger:#B03A32; --danger-soft:#F0CFCB;
-  --good:#2E6B45;
+  --good:#2E6B45; --good-soft:#D8E9DE;
   --shadow:0 1px 2px rgba(19,26,27,.08),0 8px 24px -12px rgba(19,26,27,.25);
   --f-display:"Bodoni Moda",Georgia,"Times New Roman",serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -27,7 +27,7 @@
     --brass:#D8AC4A; --brass-soft:#4A3A15;
     --sight:#3FBFBC; --sight-soft:#173C3D;
     --danger:#E0736A; --danger-soft:#43211E;
-    --good:#63B98A;
+    --good:#63B98A; --good-soft:#1B3327;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
   }
 }
@@ -39,7 +39,7 @@
   --brass:#D8AC4A; --brass-soft:#4A3A15;
   --sight:#3FBFBC; --sight-soft:#173C3D;
   --danger:#E0736A; --danger-soft:#43211E;
-  --good:#63B98A;
+  --good:#63B98A; --good-soft:#1B3327;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
 }
 
@@ -110,15 +110,14 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
   font-size:min(2.6vw,13px); color:var(--ink-3); line-height:1}
 @supports (font-size:1cqw){ .cell .cands span{font-size:2.9cqw} }
 .rays{position:absolute; inset:0; pointer-events:none; width:100%; height:100%}
-/* one consistent marker for every piece: a small bold dot on each square it sees,
-   opening into a ring where a piece already stands so the glyph stays readable */
-.dot,.ring{transform-origin:center; transform-box:fill-box; animation:pop .18s ease forwards}
-.dot{fill:var(--sight)}
-.ring{fill:none; stroke:var(--sight); stroke-width:4.5}
+/* one consistent marker for every piece: a small bold dot centred on each square it
+   sees. Over an occupied square the dot fades back so the piece stays readable. */
+.dot{fill:var(--sight); transform-origin:center; transform-box:fill-box;
+  animation:pop .18s ease forwards}
 .dot.bad{fill:var(--danger)}
-.ring.bad{stroke:var(--danger); stroke-width:6}
+.dot.on-piece{opacity:.4}
 @keyframes pop{from{transform:scale(0)} to{transform:scale(1)}}
-@media (prefers-reduced-motion:reduce){ .dot,.ring{animation:none} }
+@media (prefers-reduced-motion:reduce){ .dot{animation:none} }
 
 .coords-f,.coords-r{font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3);
   letter-spacing:.08em; display:grid}
@@ -126,6 +125,20 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
   grid-column:2}
 .coords-r{grid-template-rows:repeat(6,1fr); align-items:center; text-align:right;
   padding-right:7px; grid-column:1; grid-row:1}
+
+/* ---------- victory ---------- */
+.victory{display:flex; align-items:center; gap:10px; width:100%; max-width:562px;
+  background:var(--good-soft); border:1px solid var(--good); border-radius:3px;
+  padding:10px 14px; animation:rise .3s ease}
+.victory[hidden]{display:none}
+.victory .vg{font-family:var(--f-chess); font-size:20px; line-height:1; color:var(--good)}
+.victory .vt{font-family:var(--f-display); font-size:17px; font-weight:600; color:var(--good)}
+.victory .vs{font-size:13px; color:var(--ink-2)}
+.victory .vtime{margin-left:auto; font-family:var(--f-mono); font-size:12px; color:var(--ink-2);
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+@keyframes rise{from{opacity:0; transform:translateY(-5px)} to{opacity:1; transform:none}}
+@media (prefers-reduced-motion:reduce){ .victory{animation:none} }
+@media (max-width:420px){ .victory .vs{display:none} }
 
 /* ---------- palette ---------- */
 .palette{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; width:100%; max-width:562px}
@@ -217,6 +230,12 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
           <svg class="rays" id="rays" viewBox="0 0 600 600" preserveAspectRatio="none" aria-hidden="true"></svg>
         </div>
         <div class="coords-f" id="coordsF"></div>
+      </div>
+      <div class="victory" id="victory" role="status" hidden>
+        <span class="vg">&#9812;</span>
+        <span class="vt">Victory</span>
+        <span class="vs">Every rank, file and box holds all six, and no piece sees its twin.</span>
+        <span class="vtime" id="vTime"></span>
       </div>
       <div class="palette" id="palette"></div>
     </section>
@@ -333,23 +352,25 @@ PIECES.forEach(p=>{ SIGHT[p]=[]; for(let i=0;i<N;i++) SIGHT[p][i]=sightOf(p,i); 
 
 /* ---------- state ---------- */
 let level=LEVELS[0], grid=[], givens={}, sel=null, undo=[],
-    t0=null, tick=null, peeking=false;
+    t0=null, tick=null, peeking=false, won=false, finalTime=null;
 
 function load(lv){
   level=lv; givens={}; grid=new Array(N).fill(null); undo=[]; sel=null; peeking=false;
+  won=false; finalTime=null;
   Object.keys(lv.givens).forEach(k=>{ givens[+k]=lv.givens[k]; grid[+k]=lv.givens[k]; });
   t0=null; if(tick){clearInterval(tick); tick=null;} el("stTime").textContent="00:00";
   say(lv.blurb);
   drawLevels(); render();
 }
 function el(x){ return document.getElementById(x); }
+function fmt(ms){
+  const s=Math.max(0,Math.floor(ms/1000));
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
 function startClock(){
   if(t0||level.id==="sandbox") return;
   t0=Date.now();
-  tick=setInterval(()=>{
-    const s=Math.floor((Date.now()-t0)/1000);
-    el("stTime").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
-  },1000);
+  tick=setInterval(()=>{ el("stTime").textContent=fmt(Date.now()-t0); },1000);
 }
 
 /* ---------- rules engine ---------- */
@@ -446,11 +467,21 @@ function render(){
   el("stClues").textContent=Object.keys(givens).length;
   drawPalette();
 
-  if(filled===N && bad.size===0){
+  // a full board with no rule break IS the solution: the clues admit only one
+  // (revealing the answer doesn't count as winning it)
+  const solved = filled===N && bad.size===0 && !peeking;
+  if(solved){
+    if(!won){ won=true; finalTime = t0 ? fmt(Date.now()-t0) : null;
+      if(finalTime) el("stTime").textContent=finalTime; }
     if(tick){clearInterval(tick); tick=null;}
-    say('<span class="win-banner">Solved.</span> Every rank, file and box holds all six, '+
+    el("vTime").textContent = finalTime ? "solved in "+finalTime : "";
+    el("victory").hidden=false;
+    say('<span class="win-banner">Victory.</span> Every rank, file and box holds all six, '+
         "and no piece sees its twin.", "win");
-  } else if(showConf && msgs.length){
+  } else {
+    won=false; el("victory").hidden=true;
+  }
+  if(!solved && showConf && msgs.length){
     say(msgs[0]+(msgs.length>1?" <em>(+"+(msgs.length-1)+" more)</em>":""),"err");
   }
 }
@@ -459,14 +490,13 @@ function drawRays(p,from,lit,hits){
   if(!p||from===null||from===undefined) return;
   const svgns="http://www.w3.org/2000/svg";
   // one marker for every piece type: a small bold dot, centred on each square it sees.
-  // On a square that already holds a piece the same marker opens into a ring, so it
-  // circles the glyph instead of covering it.
+  // Where a piece already stands the dot fades back so it does not block the glyph.
   lit.forEach(j=>{
-    const[r2,c2]=rc(j), occupied=!!grid[j];
+    const[r2,c2]=rc(j);
     const ci=document.createElementNS(svgns,"circle");
     ci.setAttribute("cx",c2*100+50); ci.setAttribute("cy",r2*100+50);
-    ci.setAttribute("r",occupied?31:9);
-    ci.setAttribute("class",(occupied?"ring":"dot")+(hits.has(j)?" bad":""));
+    ci.setAttribute("r",9);
+    ci.setAttribute("class","dot"+(hits.has(j)?" bad":"")+(grid[j]?" on-piece":""));
     rays.appendChild(ci);
   });
 }
