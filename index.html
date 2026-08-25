@@ -72,15 +72,19 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
 .board-panel{display:flex; flex-direction:column; gap:14px; align-items:center}
 .board-frame{display:grid; grid-template-columns:22px minmax(0,1fr);
   grid-template-rows:auto auto; width:100%; max-width:562px}
-.board-stack{position:relative; grid-column:2}
+/* the border lives on the stack so the ray overlay (inset:0 = padding box)
+   lines up with the cell area exactly */
+.board-stack{position:relative; grid-column:2; aspect-ratio:1; container-type:inline-size;
+  border:2px solid var(--rule-hard); background:var(--rule-hard); box-shadow:var(--shadow)}
 .board-grid{
-  position:relative; display:grid; grid-template-columns:repeat(6,1fr); aspect-ratio:1;
-  border:2px solid var(--rule-hard); background:var(--rule-hard); gap:0; box-shadow:var(--shadow);
+  display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(6,1fr);
+  width:100%; height:100%; gap:0;
 }
 .cell{
   position:relative; border:0; padding:0; margin:0; cursor:pointer; background:var(--sq-light);
   display:flex; align-items:center; justify-content:center; font-family:var(--f-chess);
   color:var(--ink); transition:background .12s ease; user-select:none; -webkit-user-select:none;
+  min-width:0; min-height:0; overflow:hidden;
   box-shadow:inset -0.5px 0 0 var(--rule), inset 0 -0.5px 0 var(--rule);
 }
 .cell.dk{background:var(--sq-dark)}
@@ -90,6 +94,8 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
 .cell:focus-visible{outline:none}
 .cell .pc{font-size:min(9vw,44px); line-height:1; pointer-events:none;
   transform:translateY(-1px); transition:transform .1s ease}
+/* scale the glyph off the board itself, so it stays proportional at any board size */
+@supports (font-size:1cqw){ .cell .pc{font-size:9.5cqw} }
 .cell.given .pc{color:var(--ink)}
 .cell.mine .pc{color:var(--brass)}
 .cell.sel{background:var(--brass-soft)}
@@ -102,13 +108,17 @@ h1{font-family:var(--f-display); font-weight:600; font-size:clamp(30px,5vw,44px)
   padding:4px; pointer-events:none}
 .cell .cands span{display:flex; align-items:center; justify-content:center;
   font-size:min(2.6vw,13px); color:var(--ink-3); line-height:1}
+@supports (font-size:1cqw){ .cell .cands span{font-size:2.9cqw} }
 .rays{position:absolute; inset:0; pointer-events:none; width:100%; height:100%}
-/* one consistent marker for every piece: a small bold dot on each square it sees */
-.dot{fill:var(--sight); transform-origin:center; transform-box:fill-box;
-  animation:pop .18s ease forwards}
+/* one consistent marker for every piece: a small bold dot on each square it sees,
+   opening into a ring where a piece already stands so the glyph stays readable */
+.dot,.ring{transform-origin:center; transform-box:fill-box; animation:pop .18s ease forwards}
+.dot{fill:var(--sight)}
+.ring{fill:none; stroke:var(--sight); stroke-width:4.5}
 .dot.bad{fill:var(--danger)}
+.ring.bad{stroke:var(--danger); stroke-width:6}
 @keyframes pop{from{transform:scale(0)} to{transform:scale(1)}}
-@media (prefers-reduced-motion:reduce){ .dot{animation:none} }
+@media (prefers-reduced-motion:reduce){ .dot,.ring{animation:none} }
 
 .coords-f,.coords-r{font-family:var(--f-mono); font-size:10.5px; color:var(--ink-3);
   letter-spacing:.08em; display:grid}
@@ -448,12 +458,15 @@ function drawRays(p,from,lit,hits){
   rays.innerHTML="";
   if(!p||from===null||from===undefined) return;
   const svgns="http://www.w3.org/2000/svg";
-  // one marker style for every piece: a small bold dot on each square it sees
+  // one marker for every piece type: a small bold dot, centred on each square it sees.
+  // On a square that already holds a piece the same marker opens into a ring, so it
+  // circles the glyph instead of covering it.
   lit.forEach(j=>{
-    const[r2,c2]=rc(j);
+    const[r2,c2]=rc(j), occupied=!!grid[j];
     const ci=document.createElementNS(svgns,"circle");
     ci.setAttribute("cx",c2*100+50); ci.setAttribute("cy",r2*100+50);
-    ci.setAttribute("r",9); ci.setAttribute("class","dot"+(hits.has(j)?" bad":""));
+    ci.setAttribute("r",occupied?31:9);
+    ci.setAttribute("class",(occupied?"ring":"dot")+(hits.has(j)?" bad":""));
     rays.appendChild(ci);
   });
 }
