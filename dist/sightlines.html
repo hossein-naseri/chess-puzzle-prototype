@@ -1,0 +1,1325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sightlines</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600;6..96,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#E7EBE8; --panel:#F5F7F5; --panel-2:#DFE5E1;
+  --sq-light:#F3F6F3; --sq-dark:#DCE3DE;
+  --ink:#131A1B; --ink-2:#46534F; --ink-3:#7A8783;
+  --rule:#B8C3BD; --rule-hard:#131A1B;
+  --brass:#9A6B10; --brass-soft:#E8D7A8;
+  --sight:#17539E; --sight-soft:#C7DBF2;
+  --danger:#B03A32; --danger-soft:#F0CFCB;
+  --good:#2E6B45; --good-soft:#D8E9DE;
+  --shadow:0 1px 2px rgba(19,26,27,.08),0 8px 24px -12px rgba(19,26,27,.25);
+  --f-display:"Bodoni Moda",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --f-chess:"Noto Sans Symbols 2","Segoe UI Symbol","Apple Symbols","DejaVu Sans",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1517; --panel:#161E20; --panel-2:#1E282A;
+    --sq-light:#1D2629; --sq-dark:#151D1F;
+    --ink:#E7EEEB; --ink-2:#9AAAA5; --ink-3:#697A76;
+    --rule:#2B393B; --rule-hard:#9DB1AB;
+    --brass:#D8AC4A; --brass-soft:#4A3A15;
+    --sight:#5FA5F0; --sight-soft:#17304C;
+    --danger:#E0736A; --danger-soft:#43211E;
+    --good:#63B98A; --good-soft:#1B3327;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1517; --panel:#161E20; --panel-2:#1E282A;
+  --sq-light:#1D2629; --sq-dark:#151D1F;
+  --ink:#E7EEEB; --ink-2:#9AAAA5; --ink-3:#697A76;
+  --rule:#2B393B; --rule-hard:#9DB1AB;
+  --brass:#D8AC4A; --brass-soft:#4A3A15;
+  --sight:#5FA5F0; --sight-soft:#17304C;
+  --danger:#E0736A; --danger-soft:#43211E;
+  --good:#63B98A; --good-soft:#1B3327;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+button{-webkit-tap-highlight-color:transparent; touch-action:manipulation; font:inherit}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--f-body); font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;
+  overscroll-behavior-y:contain;
+}
+[hidden]{display:none!important}
+.view{min-height:100vh; display:flex; flex-direction:column}
+.btn{font-family:var(--f-body); font-size:14px; background:var(--panel-2); color:var(--ink);
+  border:1px solid var(--rule); border-radius:6px; padding:10px 14px; cursor:pointer}
+.btn:hover{border-color:var(--ink-3)}
+.btn.key{background:var(--ink); color:var(--ground); border-color:var(--ink)}
+.btn.key:hover{opacity:.88}
+.icon-btn{width:38px; height:38px; border-radius:50%; border:1px solid var(--rule);
+  background:var(--panel); color:var(--ink); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center}
+.icon-btn.muted{color:var(--ink-3); text-decoration:line-through}
+
+/* ================= APP HEADER (saga) ================= */
+.app-header{display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px 12px; background:var(--panel); border-bottom:1px solid var(--rule);
+  position:sticky; top:0; z-index:5}
+.app-title h1{font-family:var(--f-display); font-weight:600; font-size:24px; margin:0; letter-spacing:-.01em}
+.app-sub{font-family:var(--f-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.app-header-tools{display:flex; align-items:center; gap:10px}
+.progress-chip{font-family:var(--f-mono); font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums;
+  background:var(--panel-2); border:1px solid var(--rule); border-radius:20px; padding:6px 11px}
+
+/* ================= SAGA MAP ================= */
+.saga-scroll{flex:1; padding-bottom:78px}
+.section-band{position:relative; padding:30px 18px 46px; background:var(--band-bg); color:var(--band-ink)}
+.section-header{max-width:420px; margin:0 auto 26px; text-align:center}
+.section-eyebrow{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--band-accent); opacity:.85}
+.section-header h2{font-family:var(--f-display); font-weight:700; font-size:28px; margin:4px 0 6px;
+  text-wrap:balance}
+.section-progress{font-family:var(--f-mono); font-size:11.5px; color:var(--band-ink); opacity:.65}
+
+.node-path{max-width:420px; margin:0 auto; display:flex; flex-direction:column; align-items:center}
+.node-connector{width:3px; height:30px; background:var(--band-accent); opacity:.35; border-radius:2px}
+.level-node{position:relative; width:60px; height:60px; border-radius:50%;
+  background:var(--band-node-bg); border:2.5px solid var(--band-accent); color:var(--band-ink);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow);
+  transition:transform .12s ease}
+.level-node:active{transform:scale(.94)}
+.level-node.lane-l{align-self:flex-start; margin-left:6%}
+.level-node.lane-r{align-self:flex-end; margin-right:6%}
+.level-node.lane-c{align-self:center}
+.node-num{font-family:var(--f-display); font-weight:700; font-size:19px}
+.node-badge{position:absolute; bottom:-6px; right:-6px; width:24px; height:24px; border-radius:50%;
+  background:var(--band-accent); color:var(--band-node-bg); display:flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow)}
+.node-icon{width:14px; height:14px}
+.node-check{width:15px; height:15px}
+.node-lock{width:13px; height:13px}
+.level-node.done{background:var(--band-accent); color:var(--band-node-bg); opacity:.88}
+.level-node.done .node-num{opacity:0}
+.level-node.done .node-badge{background:var(--band-node-bg); color:var(--band-accent)}
+.level-node.locked{opacity:.42; cursor:not-allowed; border-style:dashed}
+.level-node.miniboss{width:68px; height:68px; border-width:3px}
+.level-node.boss{width:78px; height:78px; border-width:3.5px; box-shadow:0 0 0 4px var(--band-accent-soft), var(--shadow)}
+.level-node.boss .node-num{font-size:22px}
+.level-node.next-up{animation:node-pulse 1.8s ease-in-out infinite}
+@keyframes node-pulse{0%,100%{box-shadow:0 0 0 0 var(--band-accent-soft), var(--shadow)}
+  50%{box-shadow:0 0 0 8px transparent, var(--shadow)}}
+@media (prefers-reduced-motion:reduce){ .level-node.next-up{animation:none} }
+
+.chapter-barrier{max-width:420px; margin:0 auto; padding:22px 20px; text-align:center;
+  background:var(--panel); border:1px dashed var(--rule); border-radius:12px; position:relative; z-index:2}
+.barrier-lock{width:34px; height:34px; margin:0 auto 8px; color:var(--ink-3)}
+.barrier-lock svg{width:100%; height:100%}
+.barrier-text{font-size:13.5px; color:var(--ink-2); margin-bottom:12px; max-width:32ch; margin-left:auto; margin-right:auto}
+.barrier-skip{font-family:var(--f-body); font-size:13px; background:var(--panel-2); color:var(--ink);
+  border:1px solid var(--rule); border-radius:20px; padding:8px 16px; cursor:pointer}
+.barrier-skip:hover{border-color:var(--ink-3)}
+.chapter-divider{max-width:420px; margin:0 auto; padding:10px 0; text-align:center;
+  font-family:var(--f-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.chapter-divider span::before,.chapter-divider span::after{content:"—"; margin:0 8px; opacity:.5}
+
+/* section palettes: fixed identity independent of light/dark, like chapter art */
+.section-onboarding{ --band-bg:#EFE7D8; --band-ink:#2B2013; --band-accent:#9A6B10; --band-accent-soft:#e8d7a866; --band-node-bg:#FBF7EE;
+  background-image:radial-gradient(circle,#00000012 1px,transparent 1.4px); background-size:16px 16px; background-color:var(--band-bg)}
+.section-earlygame{ --band-bg:#E1EDE3; --band-ink:#173321; --band-accent:#2E6B45; --band-accent-soft:#2e6b4555; --band-node-bg:#F3FAF4;
+  background-image:repeating-linear-gradient(135deg,#00000009 0 2px,transparent 2px 14px); background-color:var(--band-bg)}
+.section-midgame{ --band-bg:#EAD3AC; --band-ink:#3A210B; --band-accent:#9A4E1C; --band-accent-soft:#9a4e1c55; --band-node-bg:#FBF1E2;
+  background-image:repeating-linear-gradient(45deg,#00000010 0 2px,transparent 2px 12px); background-color:var(--band-bg)}
+.section-endgame{ --band-bg:#171E30; --band-ink:#E7ECFB; --band-accent:#6FA8E0; --band-accent-soft:#6fa8e055; --band-node-bg:#0E1424;
+  background-image:radial-gradient(circle,#ffffff22 1px,transparent 1.4px); background-size:22px 22px; background-color:var(--band-bg)}
+
+/* ================= GAME SCREEN ================= */
+.game-header{display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--panel);
+  border-bottom:1px solid var(--rule); position:sticky; top:0; z-index:5}
+.game-header-mid{flex:1; min-width:0; text-align:center}
+.game-level-label{font-family:var(--f-display); font-weight:600; font-size:16px; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis}
+.game-level-sub{font-size:11.5px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.game-timer{font-family:var(--f-mono); font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums; min-width:44px; text-align:right}
+
+.game-body{flex:1; display:flex; flex-direction:column; align-items:center; gap:14px; padding:16px 14px 90px}
+
+.board-panel{display:flex; flex-direction:column; gap:12px; align-items:center; width:100%}
+.board-frame{display:grid; grid-template-columns:20px minmax(0,1fr); grid-template-rows:auto auto;
+  width:100%; max-width:440px}
+.board-stack{position:relative; grid-column:2; aspect-ratio:1; container-type:inline-size;
+  border:2px solid var(--rule-hard); background:var(--rule-hard); box-shadow:var(--shadow)}
+.board-grid{display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(6,1fr);
+  width:100%; height:100%; gap:0}
+.cell{position:relative; border:0; padding:0; margin:0; cursor:pointer; background:var(--sq-light);
+  display:flex; align-items:center; justify-content:center; font-family:var(--f-chess);
+  color:var(--ink); transition:background .12s ease; user-select:none; -webkit-user-select:none;
+  min-width:0; min-height:0; overflow:hidden;
+  box-shadow:inset -0.5px 0 0 var(--rule), inset 0 -0.5px 0 var(--rule)}
+.cell.dk{background:var(--sq-dark)}
+.cell.bx-r{box-shadow:inset -2px 0 0 var(--rule-hard), inset 0 -0.5px 0 var(--rule)}
+.cell.bx-b{box-shadow:inset -0.5px 0 0 var(--rule), inset 0 -2px 0 var(--rule-hard)}
+.cell.bx-r.bx-b{box-shadow:inset -2px 0 0 var(--rule-hard), inset 0 -2px 0 var(--rule-hard)}
+.cell .pc{font-size:min(9vw,40px); line-height:1; pointer-events:none}
+@supports (font-size:1cqw){ .cell .pc{font-size:9.5cqw} }
+.cell.given .pc{color:var(--ink)}
+.cell.mine .pc{color:var(--brass)}
+.cell.sel{background:var(--brass-soft)}
+.cell.sight{background:var(--sight-soft)}
+.cell.sel.sight{background:var(--brass-soft)}
+.cell.bad{background:var(--danger-soft)}
+.cell.tut-target{box-shadow:inset 0 0 0 3px var(--brass); animation:tut-glow 1.1s ease-in-out infinite}
+@keyframes tut-glow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12)}}
+.rays{position:absolute; inset:0; pointer-events:none; width:100%; height:100%}
+.dot{fill:var(--sight); transform-origin:center; transform-box:fill-box; animation:pop .18s ease forwards}
+.dot.bad{fill:var(--danger)}
+.dot.on-piece{opacity:.4}
+@keyframes pop{from{transform:scale(0)} to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){ .dot,.cell.tut-target{animation:none} }
+.coords-f,.coords-r{font-family:var(--f-mono); font-size:10px; color:var(--ink-3); letter-spacing:.06em; display:grid}
+.coords-f{grid-template-columns:repeat(6,1fr); text-align:center; padding-top:5px; grid-column:2}
+.coords-r{grid-template-rows:repeat(6,1fr); align-items:center; text-align:right; padding-right:6px; grid-column:1; grid-row:1}
+
+.victory{display:flex; align-items:center; gap:9px; width:100%; max-width:440px;
+  background:var(--good-soft); border:1px solid var(--good); border-radius:8px; padding:9px 13px; animation:rise .3s ease}
+.victory .vg{font-family:var(--f-chess); font-size:19px; color:var(--good)}
+.victory .vt{font-family:var(--f-display); font-size:16px; font-weight:600; color:var(--good)}
+.victory .vtime{margin-left:auto; font-family:var(--f-mono); font-size:11.5px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.victory-actions{display:flex; gap:8px; width:100%; max-width:440px}
+.victory-actions .btn{flex:1}
+@keyframes rise{from{opacity:0; transform:translateY(-5px)} to{opacity:1; transform:none}}
+
+.palette{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; width:100%; max-width:440px}
+.pbtn{position:relative; background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:10px 0 8px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px;
+  color:var(--ink)}
+.pbtn.done{opacity:.4}
+.pbtn.tut-target{border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-soft); animation:tut-glow 1.1s ease-in-out infinite}
+.pbtn .g{font-family:var(--f-chess); font-size:25px; line-height:1}
+.pbtn .k{font-family:var(--f-mono); font-size:9px; letter-spacing:.1em; color:var(--ink-3)}
+.pbtn .left{position:absolute; top:3px; right:5px; font-family:var(--f-mono); font-size:9px; color:var(--ink-3)}
+
+.status-row{width:100%; max-width:440px; display:flex; flex-direction:column; gap:10px}
+.status{font-size:13.5px; color:var(--ink-2); min-height:2.4em}
+.status strong{color:var(--ink); font-weight:600}
+.status.err strong{color:var(--danger)}
+.status.win{color:var(--good)}
+.status-actions{display:grid; grid-template-columns:1fr 1fr 1.3fr; gap:8px}
+
+/* ================= TUTORIAL ================= */
+.tutorial-overlay{position:fixed; inset:0; z-index:40; background:rgba(10,14,15,.4); pointer-events:auto;
+  display:flex; align-items:flex-end; justify-content:center; padding:16px}
+.tutorial-overlay.no-scrim{background:transparent; pointer-events:none}
+.tutorial-card{pointer-events:auto; background:var(--panel); border:1px solid var(--rule); border-radius:12px;
+  padding:16px 18px; max-width:380px; width:100%; box-shadow:var(--shadow); margin-bottom:14px}
+.tutorial-card p{margin:0 0 12px; font-size:14.5px; color:var(--ink)}
+.tutorial-card .btn{width:100%}
+
+/* ================= MODAL (skip confirm) ================= */
+.modal-overlay{position:fixed; inset:0; z-index:50; background:rgba(10,14,15,.5);
+  display:flex; align-items:center; justify-content:center; padding:20px}
+.modal-card{background:var(--panel); border:1px solid var(--rule); border-radius:12px; padding:20px;
+  max-width:360px; width:100%; box-shadow:var(--shadow)}
+.modal-title{font-family:var(--f-display); font-weight:700; font-size:19px; margin-bottom:8px}
+.modal-body{font-size:13.5px; color:var(--ink-2); margin-bottom:16px; line-height:1.5}
+.modal-actions{display:flex; gap:8px}
+.modal-actions .btn{flex:1}
+
+/* ================= TOAST ================= */
+.toast{position:fixed; left:50%; bottom:96px; transform:translate(-50%,10px); z-index:60;
+  background:var(--ink); color:var(--ground); font-size:13px; padding:9px 16px; border-radius:20px;
+  opacity:0; transition:opacity .18s ease, transform .18s ease; pointer-events:none; white-space:nowrap; max-width:88vw; overflow:hidden; text-overflow:ellipsis}
+.toast.show{opacity:1; transform:translate(-50%,0)}
+
+/* ================= ADS ================= */
+.ad-banner{position:fixed; left:0; right:0; bottom:0; z-index:8; height:52px; background:var(--panel-2);
+  border-top:1px solid var(--rule); display:flex; align-items:center; justify-content:space-between;
+  padding:0 14px; font-size:11px; color:var(--ink-3)}
+.ad-banner-label{font-family:var(--f-mono); letter-spacing:.1em; text-transform:uppercase}
+.ad-banner-fake{color:var(--ink-2)}
+body.has-ad-banner .saga-scroll{padding-bottom:130px}
+body.has-ad-banner .game-body{padding-bottom:142px}
+.ad-overlay{position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.82); display:flex;
+  align-items:center; justify-content:center; padding:20px}
+.ad-card{background:#111; color:#eee; border-radius:12px; padding:22px; width:100%; max-width:340px; text-align:center}
+.ad-kind{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:#9ab; margin-bottom:10px}
+.ad-fake-creative{background:repeating-linear-gradient(45deg,#222,#222 10px,#282828 10px,#282828 20px);
+  border-radius:8px; height:150px; display:flex; align-items:center; justify-content:center; color:#777;
+  font-size:12px; margin-bottom:14px}
+.ad-row{display:flex; align-items:center; justify-content:space-between}
+.ad-timer{font-family:var(--f-mono); font-size:13px; color:#aaa}
+.ad-skip{background:#333; color:#eee; border:1px solid #555; border-radius:6px; padding:7px 12px; font-size:12px; cursor:pointer}
+.ad-skip:disabled{opacity:.5; cursor:default}
+
+@media (min-width:480px){
+  .board-frame,.palette,.victory,.victory-actions,.status-row{max-width:480px}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============================= SAGA MAP ============================= -->
+<div class="view" id="view-saga">
+  <header class="app-header">
+    <div class="app-title">
+      <h1>Sightlines</h1>
+      <div class="app-sub">Chess &times; Sudoku</div>
+    </div>
+    <div class="app-header-tools">
+      <span class="progress-chip" id="progressChip">0 / 33</span>
+      <button type="button" class="icon-btn" id="soundBtn" aria-label="Toggle sound">&#9835;</button>
+    </div>
+  </header>
+  <div class="saga-scroll" id="sagaScroll"></div>
+</div>
+
+<!-- ============================= GAME SCREEN ============================= -->
+<div class="view" id="view-game" hidden>
+  <header class="game-header">
+    <button type="button" class="icon-btn" id="backBtn" aria-label="Back to map">&#8592;</button>
+    <div class="game-header-mid">
+      <div class="game-level-label" id="gameLevelLabel">—</div>
+      <div class="game-level-sub" id="gameLevelSub">—</div>
+    </div>
+    <div class="game-timer" id="gameTimer">00:00</div>
+  </header>
+
+  <div class="game-body">
+    <div class="board-panel">
+      <div class="board-frame">
+        <div class="coords-r" id="coordsR"></div>
+        <div class="board-stack">
+          <div class="board-grid" id="board"></div>
+          <svg class="rays" id="rays" viewBox="0 0 600 600" preserveAspectRatio="none" aria-hidden="true"></svg>
+        </div>
+        <div class="coords-f" id="coordsF"></div>
+      </div>
+
+      <div class="victory" id="victory" role="status" hidden>
+        <span class="vg">&#9812;</span>
+        <span class="vt" id="victoryTitle">Victory</span>
+        <span class="vtime" id="vTime"></span>
+      </div>
+      <div class="victory-actions" id="victoryActions" hidden>
+        <button type="button" class="btn" id="btnLevelSelect">Level select</button>
+        <button type="button" class="btn key" id="btnNextLevel">Next level</button>
+      </div>
+
+      <div class="palette" id="palette"></div>
+    </div>
+
+    <div class="status-row">
+      <div class="status" id="status">—</div>
+      <div class="status-actions">
+        <button type="button" class="btn" id="btnUndo">Undo</button>
+        <button type="button" class="btn" id="btnReset">Reset</button>
+        <button type="button" class="btn key" id="btnHint">Hint &#9658;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- tutorial coach-mark overlay, only used on the first level -->
+  <div class="tutorial-overlay" id="tutorialOverlay" hidden>
+    <div class="tutorial-card" id="tutorialCard"></div>
+  </div>
+</div>
+
+<!-- skip-barrier confirmation -->
+<div class="modal-overlay" id="skipOverlay" hidden>
+  <div class="modal-card">
+    <div class="modal-title" id="skipTitle">Skip ahead?</div>
+    <div class="modal-body" id="skipBody"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="skipNo">Stay here</button>
+      <button type="button" class="btn key" id="skipYes">Skip ahead</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// Generated by solver/build_saga.py - do not hand-edit.
+window.SL = window.SL || {};
+SL.BOARD = {"H": 6, "W": 6, "boxes": [[0, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1], [2, 2, 2, 3, 3, 3], [2, 2, 2, 3, 3, 3], [4, 4, 4, 5, 5, 5], [4, 4, 4, 5, 5, 5]]};
+SL.SECTIONS = {"onboarding": {"name": "Prologue", "roman": true}, "earlygame": {"name": "The Open Game", "roman": false}, "midgame": {"name": "The Middlegame", "roman": false}, "endgame": {"name": "The Endgame", "roman": false}};
+SL.LEVELS = [{"id": "on-1", "section": "onboarding", "local": 1, "label": "I", "tag": "tutorial", "tutorial": true, "technique": "singles only", "clues": 16, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"4": "Q", "5": "N", "6": "N", "10": "R", "11": "B", "13": "B", "14": "R", "15": "N", "20": "N", "23": "Q", "25": "N", "27": "Q", "28": "K", "33": "B", "34": "N", "35": "P"}, "solution": ["K", "R", "B", "P", "Q", "N", "N", "P", "Q", "K", "R", "B", "Q", "B", "R", "N", "P", "K", "P", "K", "N", "R", "B", "Q", "B", "N", "P", "Q", "K", "R", "R", "Q", "K", "B", "N", "P"]}, {"id": "on-2", "section": "onboarding", "local": 2, "label": "II", "tag": null, "tutorial": false, "technique": "singles only", "clues": 13, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"0": "N", "9": "B", "10": "N", "15": "N", "20": "N", "25": "N", "29": "P", "30": "R", "31": "Q", "33": "K", "34": "B", "35": "N", "7": "R"}, "solution": ["N", "B", "K", "P", "Q", "R", "P", "R", "Q", "B", "N", "K", "Q", "K", "R", "N", "P", "B", "B", "P", "N", "R", "K", "Q", "K", "N", "B", "Q", "R", "P", "R", "Q", "P", "K", "B", "N"]}, {"id": "on-3", "section": "onboarding", "local": 3, "label": "III", "tag": null, "tutorial": false, "technique": "singles only", "clues": 11, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"0": "R", "2": "P", "3": "K", "11": "P", "13": "P", "24": "P", "25": "R", "27": "Q", "28": "N", "30": "N", "33": "P"}, "solution": ["R", "B", "P", "K", "Q", "N", "K", "N", "Q", "B", "R", "P", "Q", "P", "N", "R", "K", "B", "B", "K", "R", "N", "P", "Q", "P", "R", "B", "Q", "N", "K", "N", "Q", "K", "P", "B", "R"]}, {"id": "ea-1", "section": "earlygame", "local": 1, "label": "1", "tag": null, "tutorial": false, "technique": "singles only", "clues": 10, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"2": "N", "11": "N", "16": "N", "24": "N", "33": "N", "22": "P", "34": "B", "27": "Q", "0": "K", "9": "B"}, "solution": ["K", "B", "N", "P", "Q", "R", "P", "R", "Q", "B", "K", "N", "Q", "K", "P", "R", "N", "B", "B", "N", "R", "K", "P", "Q", "N", "P", "B", "Q", "R", "K", "R", "Q", "K", "N", "B", "P"]}, {"id": "ea-2", "section": "earlygame", "local": 2, "label": "2", "tag": null, "tutorial": false, "technique": "singles only", "clues": 10, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"0": "N", "10": "N", "15": "N", "20": "N", "35": "N", "23": "K", "34": "P", "6": "Q", "33": "B", "8": "K"}, "solution": ["N", "P", "B", "Q", "K", "R", "Q", "R", "K", "P", "N", "B", "K", "B", "R", "N", "Q", "P", "P", "Q", "N", "R", "B", "K", "B", "N", "P", "K", "R", "Q", "R", "K", "Q", "B", "P", "N"]}, {"id": "ea-3", "section": "earlygame", "local": 3, "label": "3", "tag": null, "tutorial": false, "technique": "singles only", "clues": 9, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"5": "N", "7": "N", "14": "N", "21": "N", "30": "N", "15": "R", "16": "B", "12": "Q", "18": "P"}, "solution": ["R", "P", "K", "B", "Q", "N", "B", "N", "Q", "P", "R", "K", "Q", "K", "N", "R", "B", "P", "P", "B", "R", "N", "K", "Q", "K", "R", "P", "Q", "N", "B", "N", "Q", "B", "K", "P", "R"]}, {"id": "ea-4", "section": "earlygame", "local": 4, "label": "4", "tag": null, "tutorial": false, "technique": "singles only", "clues": 9, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"6": "N", "21": "R", "29": "N", "31": "Q", "32": "N", "34": "B", "8": "Q", "26": "B", "24": "K"}, "solution": ["R", "B", "P", "N", "Q", "K", "N", "K", "Q", "B", "R", "P", "Q", "N", "R", "P", "K", "B", "B", "P", "K", "R", "N", "Q", "K", "R", "B", "Q", "P", "N", "P", "Q", "N", "K", "B", "R"]}, {"id": "ea-5", "section": "earlygame", "local": 5, "label": "5", "tag": "miniboss", "tutorial": false, "technique": "vision pointing", "clues": 7, "hasKnightClue": true, "blurb": "Miniboss. A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"5": "R", "10": "N", "12": "K", "21": "R", "25": "N", "6": "B", "17": "Q"}, "solution": ["N", "Q", "P", "B", "K", "R", "B", "R", "K", "Q", "N", "P", "K", "P", "R", "N", "B", "Q", "Q", "B", "N", "R", "P", "K", "P", "N", "Q", "K", "R", "B", "R", "K", "B", "P", "Q", "N"]}, {"id": "ea-6", "section": "earlygame", "local": 6, "label": "6", "tag": null, "tutorial": false, "technique": "singles only", "clues": 8, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"15": "R", "16": "P", "19": "P", "20": "R", "22": "Q", "28": "N", "31": "K", "17": "B"}, "solution": ["R", "B", "Q", "P", "K", "N", "P", "N", "K", "B", "R", "Q", "K", "Q", "N", "R", "P", "B", "B", "P", "R", "N", "Q", "K", "Q", "R", "B", "K", "N", "P", "N", "K", "P", "Q", "B", "R"]}, {"id": "ea-7", "section": "earlygame", "local": 7, "label": "7", "tag": null, "tutorial": false, "technique": "singles only", "clues": 8, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"5": "N", "6": "K", "9": "Q", "14": "N", "21": "N", "23": "P", "29": "K", "35": "R"}, "solution": ["R", "Q", "B", "K", "P", "N", "K", "N", "P", "Q", "R", "B", "P", "B", "N", "R", "K", "Q", "Q", "K", "R", "N", "B", "P", "B", "R", "Q", "P", "N", "K", "N", "P", "K", "B", "Q", "R"]}, {"id": "ea-8", "section": "earlygame", "local": 8, "label": "8", "tag": null, "tutorial": false, "technique": "singles only", "clues": 7, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"1": "K", "6": "P", "15": "R", "22": "B", "30": "N", "32": "P", "24": "B"}, "solution": ["R", "K", "B", "P", "Q", "N", "P", "N", "Q", "K", "R", "B", "Q", "B", "N", "R", "P", "K", "K", "P", "R", "N", "B", "Q", "B", "R", "K", "Q", "N", "P", "N", "Q", "P", "B", "K", "R"]}, {"id": "ea-9", "section": "earlygame", "local": 9, "label": "9", "tag": null, "tutorial": false, "technique": "singles only", "clues": 7, "hasKnightClue": true, "blurb": "Every step is a single: some cell or some piece has only one home left.", "givens": {"4": "N", "15": "R", "21": "N", "30": "K", "33": "P", "18": "B", "23": "K"}, "solution": ["R", "B", "K", "Q", "N", "P", "Q", "N", "P", "B", "K", "R", "P", "K", "N", "R", "Q", "B", "B", "Q", "R", "N", "P", "K", "N", "P", "B", "K", "R", "Q", "K", "R", "Q", "P", "B", "N"]}, {"id": "ea-10", "section": "earlygame", "local": 10, "label": "10", "tag": "boss", "tutorial": false, "technique": "vision pointing", "clues": 6, "hasKnightClue": true, "blurb": "Boss. A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"5": "R", "15": "N", "22": "B", "24": "B", "31": "Q", "34": "K"}, "solution": ["N", "K", "B", "P", "Q", "R", "P", "R", "Q", "K", "N", "B", "Q", "B", "R", "N", "P", "K", "K", "P", "N", "R", "B", "Q", "B", "N", "K", "Q", "R", "P", "R", "Q", "P", "B", "K", "N"]}, {"id": "mi-1", "section": "midgame", "local": 1, "label": "1", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 7, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"7": "N", "18": "P", "24": "B", "26": "P", "30": "N", "33": "B", "29": "Q"}, "solution": ["R", "P", "B", "Q", "K", "N", "Q", "N", "K", "P", "R", "B", "K", "B", "N", "R", "Q", "P", "P", "Q", "R", "N", "B", "K", "B", "R", "P", "K", "N", "Q", "N", "K", "Q", "B", "P", "R"]}, {"id": "mi-2", "section": "midgame", "local": 2, "label": "2", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 7, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"3": "K", "7": "R", "10": "N", "19": "K", "26": "Q", "32": "K", "8": "P"}, "solution": ["N", "Q", "B", "K", "P", "R", "K", "R", "P", "Q", "N", "B", "P", "B", "R", "N", "K", "Q", "Q", "K", "N", "R", "B", "P", "B", "N", "Q", "P", "R", "K", "R", "P", "K", "B", "Q", "N"]}, {"id": "mi-3", "section": "midgame", "local": 3, "label": "3", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 6, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"6": "K", "14": "R", "22": "B", "27": "Q", "28": "R", "30": "R"}, "solution": ["N", "P", "B", "K", "Q", "R", "K", "R", "Q", "P", "N", "B", "Q", "B", "R", "N", "K", "P", "P", "K", "N", "R", "B", "Q", "B", "N", "P", "Q", "R", "K", "R", "Q", "K", "B", "P", "N"]}, {"id": "mi-4", "section": "midgame", "local": 4, "label": "4", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 6, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"10": "R", "34": "K", "23": "K", "28": "N", "8": "P", "19": "B"}, "solution": ["R", "K", "Q", "B", "P", "N", "B", "N", "P", "K", "R", "Q", "K", "Q", "N", "R", "B", "P", "P", "B", "R", "N", "Q", "K", "Q", "R", "K", "P", "N", "B", "N", "P", "B", "Q", "K", "R"]}, {"id": "mi-5", "section": "midgame", "local": 5, "label": "5", "tag": "miniboss", "tutorial": false, "technique": "line/box lock", "clues": 5, "hasKnightClue": true, "blurb": "Miniboss. Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"10": "N", "23": "P", "26": "Q", "4": "P", "13": "K"}, "solution": ["N", "Q", "K", "B", "P", "R", "B", "R", "P", "Q", "N", "K", "P", "K", "R", "N", "B", "Q", "Q", "B", "N", "R", "K", "P", "K", "N", "Q", "P", "R", "B", "R", "P", "B", "K", "Q", "N"]}, {"id": "mi-6", "section": "midgame", "local": 6, "label": "6", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 6, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"6": "K", "11": "Q", "21": "R", "7": "R", "17": "B", "0": "N"}, "solution": ["N", "B", "Q", "K", "P", "R", "K", "R", "P", "B", "N", "Q", "P", "Q", "R", "N", "K", "B", "B", "K", "N", "R", "Q", "P", "Q", "N", "B", "P", "R", "K", "R", "P", "K", "Q", "B", "N"]}, {"id": "mi-7", "section": "midgame", "local": 7, "label": "7", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 5, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"23": "B", "35": "R", "1": "Q", "20": "P", "0": "R"}, "solution": ["R", "Q", "K", "N", "B", "P", "N", "P", "B", "Q", "R", "K", "B", "N", "R", "K", "P", "Q", "Q", "K", "P", "R", "N", "B", "P", "R", "Q", "B", "K", "N", "K", "B", "N", "P", "Q", "R"]}, {"id": "mi-8", "section": "midgame", "local": 8, "label": "8", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 5, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"14": "N", "12": "P", "19": "Q", "11": "B", "27": "P"}, "solution": ["R", "K", "B", "Q", "P", "N", "Q", "N", "P", "K", "R", "B", "P", "B", "N", "R", "Q", "K", "K", "Q", "R", "N", "B", "P", "B", "R", "K", "P", "N", "Q", "N", "P", "Q", "B", "K", "R"]}, {"id": "mi-9", "section": "midgame", "local": 9, "label": "9", "tag": null, "tutorial": false, "technique": "vision pointing", "clues": 5, "hasKnightClue": true, "blurb": "A piece confined to a few cells still rules out squares elsewhere - the vision squeeze.", "givens": {"7": "R", "10": "P", "34": "Q", "0": "N", "4": "R"}, "solution": ["N", "Q", "P", "B", "R", "K", "B", "R", "K", "Q", "P", "N", "K", "P", "N", "R", "B", "Q", "Q", "B", "R", "N", "K", "P", "R", "K", "Q", "P", "N", "B", "P", "N", "B", "K", "Q", "R"]}, {"id": "mi-10", "section": "midgame", "local": 10, "label": "10", "tag": "boss", "tutorial": false, "technique": "line/box lock", "clues": 4, "hasKnightClue": true, "blurb": "Boss. Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"29": "Q", "20": "P", "30": "K", "4": "N"}, "solution": ["P", "K", "B", "Q", "N", "R", "Q", "N", "R", "P", "K", "B", "N", "B", "K", "R", "Q", "P", "R", "Q", "P", "N", "B", "K", "B", "R", "N", "K", "P", "Q", "K", "P", "Q", "B", "R", "N"]}, {"id": "en-1", "section": "endgame", "local": 1, "label": "1", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 6, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"0": "K", "8": "B", "18": "Q", "25": "P", "28": "R", "34": "Q"}, "solution": ["K", "Q", "N", "P", "B", "R", "P", "R", "B", "Q", "K", "N", "B", "K", "P", "R", "N", "Q", "Q", "N", "R", "K", "P", "B", "N", "P", "Q", "B", "R", "K", "R", "B", "K", "N", "Q", "P"]}, {"id": "en-2", "section": "endgame", "local": 2, "label": "2", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 6, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"3": "B", "11": "R", "20": "R", "27": "P", "31": "R", "26": "Q"}, "solution": ["R", "Q", "P", "B", "N", "K", "B", "N", "K", "Q", "P", "R", "K", "P", "N", "R", "B", "Q", "Q", "B", "R", "N", "K", "P", "N", "K", "Q", "P", "R", "B", "P", "R", "B", "K", "Q", "N"]}, {"id": "en-3", "section": "endgame", "local": 3, "label": "3", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 5, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"6": "Q", "24": "R", "23": "P", "9": "B", "22": "K"}, "solution": ["N", "B", "P", "Q", "R", "K", "Q", "R", "K", "B", "P", "N", "K", "P", "N", "R", "Q", "B", "B", "Q", "R", "N", "K", "P", "R", "K", "B", "P", "N", "Q", "P", "N", "Q", "K", "B", "R"]}, {"id": "en-4", "section": "endgame", "local": 4, "label": "4", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 5, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"31": "P", "8": "N", "33": "B", "2": "B", "14": "P"}, "solution": ["P", "K", "B", "Q", "R", "N", "Q", "R", "N", "K", "P", "B", "R", "B", "P", "N", "Q", "K", "N", "Q", "K", "R", "B", "P", "B", "N", "R", "P", "K", "Q", "K", "P", "Q", "B", "N", "R"]}, {"id": "en-5", "section": "endgame", "local": 5, "label": "5", "tag": "miniboss", "tutorial": false, "technique": "line/box lock", "clues": 4, "hasKnightClue": true, "blurb": "Miniboss. Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"10": "P", "15": "N", "33": "Q", "1": "K"}, "solution": ["P", "K", "Q", "B", "R", "N", "B", "R", "N", "K", "P", "Q", "R", "Q", "P", "N", "B", "K", "N", "B", "K", "R", "Q", "P", "Q", "N", "R", "P", "K", "B", "K", "P", "B", "Q", "N", "R"]}, {"id": "en-6", "section": "endgame", "local": 6, "label": "6", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 5, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"6": "Q", "14": "R", "23": "P", "31": "K", "11": "B"}, "solution": ["N", "P", "B", "Q", "K", "R", "Q", "R", "K", "P", "N", "B", "P", "B", "R", "N", "Q", "K", "K", "Q", "N", "R", "B", "P", "B", "N", "P", "K", "R", "Q", "R", "K", "Q", "B", "P", "N"]}, {"id": "en-7", "section": "endgame", "local": 7, "label": "7", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 5, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"4": "B", "6": "Q", "11": "P", "14": "N", "26": "K"}, "solution": ["R", "K", "P", "Q", "B", "N", "Q", "N", "B", "K", "R", "P", "B", "P", "N", "R", "Q", "K", "K", "Q", "R", "N", "P", "B", "P", "R", "K", "B", "N", "Q", "N", "B", "Q", "P", "K", "R"]}, {"id": "en-8", "section": "endgame", "local": 8, "label": "8", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 4, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"25": "N", "26": "B", "11": "Q", "3": "P"}, "solution": ["N", "B", "Q", "P", "K", "R", "P", "R", "K", "B", "N", "Q", "K", "Q", "R", "N", "P", "B", "B", "P", "N", "R", "Q", "K", "Q", "N", "B", "K", "R", "P", "R", "K", "P", "Q", "B", "N"]}, {"id": "en-9", "section": "endgame", "local": 9, "label": "9", "tag": null, "tutorial": false, "technique": "line/box lock", "clues": 4, "hasKnightClue": true, "blurb": "Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"23": "B", "1": "N", "19": "K", "11": "Q"}, "solution": ["K", "N", "Q", "P", "B", "R", "R", "P", "B", "K", "N", "Q", "B", "Q", "R", "N", "P", "K", "P", "K", "N", "R", "Q", "B", "Q", "R", "P", "B", "K", "N", "N", "B", "K", "Q", "R", "P"]}, {"id": "en-10", "section": "endgame", "local": 10, "label": "10", "tag": "boss", "tutorial": false, "technique": "line/box lock", "clues": 4, "hasKnightClue": true, "blurb": "Boss. Chains a line/box lock together with the vision squeeze. Nothing spare.", "givens": {"33": "Q", "4": "B", "1": "K", "15": "N"}, "solution": ["N", "K", "Q", "P", "B", "R", "P", "R", "B", "K", "N", "Q", "B", "Q", "R", "N", "P", "K", "K", "P", "N", "R", "Q", "B", "Q", "N", "K", "B", "R", "P", "R", "B", "P", "Q", "K", "N"]}];
+
+</script>
+<script>
+// Board geometry and the chess-sudoku rule engine. Pure functions, no DOM.
+(function(){
+"use strict";
+const BOARD = window.SL.BOARD;
+const H = BOARD.H, W = BOARD.W, N = H*W;
+const PIECES = ["P","N","B","R","Q","K"];
+const GLYPH = {P:"♟",N:"♞",B:"♝",R:"♜",Q:"♛",K:"♚"};
+const NAME  = {P:"Pawn",N:"Knight",B:"Bishop",R:"Rook",Q:"Queen",K:"King"};
+const RULE = {
+  P:"No twin diagonally touching — pawns capture on the diagonal.",
+  N:"No twin a knight's leap away.",
+  B:"No twin anywhere on either diagonal, at any distance.",
+  R:"Row and column, which the sudoku rule already forbids. The rook is free.",
+  Q:"No twin on a diagonal (her rank and file are already spoken for).",
+  K:"No twin on any touching square."
+};
+const FILES = "abcdefghij".slice(0,W);
+
+function rc(i){ return [Math.floor(i/W), i%W]; }
+function idOf(r,c){ return r*W+c; }
+function boxOf(i){ const[r,c]=rc(i); return BOARD.boxes[r][c]; }
+function coord(i){ const[r,c]=rc(i); return FILES[c]+(H-r); }
+
+function sees(p,r1,c1,r2,c2){
+  const dr=Math.abs(r2-r1), dc=Math.abs(c2-c1);
+  if(!dr&&!dc) return false;
+  switch(p){
+    case "P": return dr===1&&dc===1;
+    case "N": return (dr===1&&dc===2)||(dr===2&&dc===1);
+    case "B": return dr===dc;
+    case "R": return dr===0||dc===0;
+    case "Q": return dr===dc||dr===0||dc===0;
+    case "K": return Math.max(dr,dc)===1;
+  }
+  return false;
+}
+function sightOf(p,i){
+  const[r,c]=rc(i), out=[];
+  for(let j=0;j<N;j++){ if(j===i) continue; const[r2,c2]=rc(j);
+    if(sees(p,r,c,r2,c2)) out.push(j); }
+  return out;
+}
+const SIGHT={};
+PIECES.forEach(p=>{ SIGHT[p]=[]; for(let i=0;i<N;i++) SIGHT[p][i]=sightOf(p,i); });
+
+const UNITS=(()=>{
+  const u=[];
+  for(let r=0;r<H;r++) u.push({name:"rank "+(H-r), cells:Array.from({length:W},(_,c)=>idOf(r,c))});
+  for(let c=0;c<W;c++) u.push({name:"file "+FILES[c], cells:Array.from({length:H},(_,r)=>idOf(r,c))});
+  const nbox = Math.max(...BOARD.boxes.flat())+1;
+  for(let b=0;b<nbox;b++) u.push({name:"box "+(b+1),
+    cells:Array.from({length:N},(_,i)=>i).filter(i=>boxOf(i)===b)});
+  return u;
+})();
+
+function conflicts(grid){
+  const bad=new Set(), msgs=[];
+  for(let i=0;i<N;i++){
+    const p=grid[i]; if(!p) continue;
+    const[r1,c1]=rc(i);
+    for(let j=i+1;j<N;j++){
+      if(grid[j]!==p) continue;
+      const[r2,c2]=rc(j);
+      let why=null;
+      if(r1===r2) why="share rank "+(H-r1);
+      else if(c1===c2) why="share file "+FILES[c1];
+      else if(boxOf(i)===boxOf(j)) why="sit in one box";
+      else if(sees(p,r1,c1,r2,c2)) why="see each other";
+      if(why){ bad.add(i); bad.add(j);
+        msgs.push("The "+NAME[p].toLowerCase()+"s on <strong>"+coord(i)+"</strong> and <strong>"+
+                  coord(j)+"</strong> "+why+"."); }
+    }
+  }
+  return {bad, msgs};
+}
+function candidates(grid, i){
+  if(grid[i]) return [];
+  const[r,c]=rc(i), b=boxOf(i);
+  return PIECES.filter(p=>{
+    for(let j=0;j<N;j++){
+      if(j===i||grid[j]!==p) continue;
+      const[r2,c2]=rc(j);
+      if(r2===r||c2===c||boxOf(j)===b||sees(p,r,c,r2,c2)) return false;
+    }
+    return true;
+  });
+}
+
+window.SL.Rules = {H,W,N,PIECES,GLYPH,NAME,RULE,FILES,UNITS,SIGHT,
+  rc, id:idOf, boxOf, coord, sees, sightOf, conflicts, candidates};
+})();
+
+</script>
+<script>
+// Local progress persistence. Swap target for the Play Store build:
+// replace localStorage with @capacitor/preferences (same get/set shape,
+// just async) - the rest of the app only calls the functions below.
+(function(){
+"use strict";
+const KEY = "sightlines.progress.v1";
+
+function blank(){
+  return { completed:{}, times:{}, hints:{}, skip:{}, sound:true, seenTutorial:false };
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return blank();
+    const s = JSON.parse(raw);
+    return Object.assign(blank(), s);
+  }catch(e){ return blank(); }
+}
+let state = load();
+function persist(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ /* storage unavailable: play on, just don't save */ }
+}
+
+window.SL.Storage = {
+  isComplete: id => !!state.completed[id],
+  bestTime: id => state.times[id] || null,
+  hintsUsed: id => state.hints[id] || 0,
+  markComplete(id, timeMs, hintsUsedThisRun){
+    state.completed[id] = true;
+    if(timeMs!=null && (!state.times[id] || timeMs < state.times[id])) state.times[id] = timeMs;
+    state.hints[id] = (state.hints[id]||0) + (hintsUsedThisRun||0);
+    persist();
+  },
+  addHintUsed(id){ state.hints[id] = (state.hints[id]||0)+1; persist(); },
+  hasSkip: boundary => !!state.skip[boundary],
+  setSkip(boundary){ state.skip[boundary] = true; persist(); },
+  getSound: () => state.sound !== false,
+  setSound(v){ state.sound = !!v; persist(); },
+  getSeenTutorial: () => !!state.seenTutorial,
+  setSeenTutorial(v){ state.seenTutorial = !!v; persist(); },
+  totalCompleted: () => Object.keys(state.completed).length,
+  _debugReset(){ state = blank(); persist(); },
+};
+})();
+
+</script>
+<script>
+// Analytics: single choke point. Every call in the app goes through
+// SL.Analytics.log(name, params). Today it only logs to the console and an
+// in-memory ring buffer you can inspect from devtools (SL.Analytics.history).
+//
+// TO WIRE UP REAL ANALYTICS LATER (Firebase):
+//   1. npm install @capacitor-firebase/analytics (or @capacitor-community/firebase-analytics)
+//   2. Add the Firebase config from your Firebase project (google-services.json
+//      for Android goes in android/app/ once the Capacitor project exists).
+//   3. Replace the body of `send()` below with:
+//        FirebaseAnalytics.logEvent({ name, params });
+//      Nothing else in the app needs to change - every screen already calls
+//      SL.Analytics.log(), never a vendor SDK directly.
+(function(){
+"use strict";
+const MAX_HISTORY = 300;
+const history = [];
+let firebaseConfig = null;
+
+function send(name, params){
+  // TODO(play-store): route to FirebaseAnalytics.logEvent({name, params}) here.
+  console.log("[analytics]", name, params||{});
+}
+
+function log(name, params){
+  const entry = {name, params: params||{}, t: Date.now()};
+  history.push(entry);
+  if(history.length > MAX_HISTORY) history.shift();
+  send(name, params);
+  window.dispatchEvent(new CustomEvent("sl:analytics", {detail: entry}));
+}
+
+window.SL.Analytics = {
+  log,
+  history,
+  configureFirebase(config){ firebaseConfig = config; log("analytics_configured", {hasConfig: !!config}); },
+};
+})();
+
+</script>
+<script>
+// Ad placements: bottom banner, interstitial (first after level 2, then
+// every level), rewarded video gating hints. All three are simulated here
+// with real timing and a real UI flow so the cadence and UX can be judged
+// before any network SDK is wired in.
+//
+// TO WIRE UP ADMOB LATER (Capacitor):
+//   1. npm install @capacitor-community/admob
+//   2. Call SL.Ads.configureAdMob({appId, bannerUnitId, interstitialUnitId,
+//      rewardedUnitId}) once you have real ad unit IDs from your AdMob
+//      account (test IDs first - see Google's AdMob test ad unit docs).
+//   3. Replace the bodies of showBanner/hideBanner/_playInterstitial/
+//      _playRewarded below with the matching AdMob plugin calls
+//      (AdMob.showBanner, AdMob.prepareInterstitial+showInterstitial,
+//      AdMob.prepareRewardedAd+showRewardedAd). Every call site elsewhere
+//      in the app already goes through the functions in this file, so nothing
+//      else changes.
+(function(){
+"use strict";
+const A = window.SL.Analytics;
+let ids = null;
+let bannerEl = null;
+let overlayEl = null;
+let interstitialEligible = false;   // flips true once 2 levels are completed
+
+function ensureDom(){
+  if(bannerEl) return;
+  bannerEl = document.createElement("div");
+  bannerEl.className = "ad-banner";
+  bannerEl.innerHTML = '<span class="ad-banner-label">Advertisement</span>' +
+    '<span class="ad-banner-fake">Sightlines Premium — remove ads</span>';
+  bannerEl.hidden = true;
+  document.body.appendChild(bannerEl);
+
+  overlayEl = document.createElement("div");
+  overlayEl.className = "ad-overlay";
+  overlayEl.hidden = true;
+  document.body.appendChild(overlayEl);
+}
+
+function showBanner(){
+  ensureDom();
+  bannerEl.hidden = false;
+  document.body.classList.add("has-ad-banner");
+  A.log("ad_banner_shown", {});
+}
+function hideBanner(){
+  ensureDom();
+  bannerEl.hidden = true;
+  document.body.classList.remove("has-ad-banner");
+}
+
+// opts.skippableAfter = seconds that must elapse before a skip control appears
+// at all (0/undefined = not skippable - the interstitial case). The ad always
+// auto-resolves at `seconds` regardless of whether it was skippable.
+function playSimulated(kind, seconds, opts){
+  ensureDom();
+  return new Promise(resolve=>{
+    A.log(kind+"_requested", {});
+    let remain = seconds;
+    const canSkip = !!opts.skippableAfter;
+    overlayEl.innerHTML =
+      '<div class="ad-card">'+
+        '<div class="ad-kind">'+opts.title+'</div>'+
+        '<div class="ad-fake-creative">'+opts.creative+'</div>'+
+        '<div class="ad-row">'+
+          '<span class="ad-timer" id="adTimer">'+remain+'s</span>'+
+          (canSkip ? '<button type="button" class="ad-skip" id="adSkip" disabled>wait...</button>' : '')+
+        '</div>'+
+      '</div>';
+    overlayEl.hidden = false;
+    A.log(kind+"_shown", {});
+    const skipBtn = overlayEl.querySelector("#adSkip");
+    const timerEl = overlayEl.querySelector("#adTimer");
+    let finished = false;
+    function finish(reason){
+      if(finished) return; finished = true;
+      clearInterval(timer);
+      overlayEl.hidden = true;
+      overlayEl.innerHTML = "";
+      A.log(kind+"_"+reason, {});
+      resolve(reason);
+    }
+    if(skipBtn) skipBtn.addEventListener("click", ()=> finish("skipped"));
+    const timer = setInterval(()=>{
+      remain -= 1;
+      timerEl.textContent = Math.max(remain,0)+"s";
+      if(canSkip && skipBtn && seconds-remain >= opts.skippableAfter){
+        skipBtn.disabled = false; skipBtn.textContent = opts.skipLabel;
+      }
+      if(remain<=0) finish(opts.rewarded ? "completed" : "dismissed");
+    },1000);
+  });
+}
+
+async function maybeInterstitial(totalCompletedSoFar){
+  // first trigger once 2 levels are done; every completion after that too
+  if(totalCompletedSoFar < 2) return;
+  await playSimulated("interstitial", 3, {
+    title: "Interstitial ad", creative: "(placeholder creative)",
+    skippableAfter: 0, rewarded: false,
+  });
+}
+
+async function showRewarded(){
+  const reason = await playSimulated("rewarded_ad", 5, {
+    title: "Watch for a hint", creative: "(placeholder rewarded video)",
+    skipLabel: "Skip (no reward)", skippableAfter: 2, rewarded: true,
+  });
+  return reason === "completed";
+}
+
+window.SL.Ads = {
+  init(){ ensureDom(); },
+  showBanner, hideBanner,
+  maybeInterstitial,
+  showRewarded,
+  configureAdMob(config){ ids = config; A.log("ads_configured", {hasConfig: !!config}); },
+};
+})();
+
+</script>
+<script>
+// Small synthesised sound set via WebAudio - no binary assets to license or
+// ship, and the whole game stays offline-installable. Swap for real SFX
+// files later by replacing the `tone`/`sequence` calls in SFX with
+// AudioBufferSourceNode playback; the SL.Audio.play(name) call sites
+// elsewhere never need to change.
+(function(){
+"use strict";
+let ctx = null;
+let muted = !window.SL.Storage.getSound();
+
+function ensureCtx(){
+  if(ctx) return ctx;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC) return null;
+  ctx = new AC();
+  return ctx;
+}
+// mobile browsers suspend audio until a user gesture; call this on first tap
+function unlock(){
+  const c = ensureCtx();
+  if(c && c.state === "suspended") c.resume();
+}
+
+function tone(freq, dur, {type="sine", gain=0.16, delay=0, glideTo=null}={}){
+  if(muted) return;
+  const c = ensureCtx(); if(!c) return;
+  const t0 = c.currentTime + delay;
+  const osc = c.createOscillator(), g = c.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(freq, t0);
+  if(glideTo) osc.frequency.linearRampToValueAtTime(glideTo, t0+dur);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(gain, t0+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  osc.connect(g); g.connect(c.destination);
+  osc.start(t0); osc.stop(t0+dur+0.02);
+}
+function sequence(notes){ notes.forEach(n=>tone(n.f, n.d, {...n, delay:n.t})); }
+
+const SFX = {
+  select:   ()=> tone(520, 0.05, {type:"triangle", gain:0.10}),
+  place:    ()=> tone(660, 0.08, {type:"sine",   gain:0.14}),
+  clear:    ()=> tone(340, 0.07, {type:"sine",   gain:0.10}),
+  error:    ()=> tone(160, 0.16, {type:"sawtooth", gain:0.10, glideTo:110}),
+  locked:   ()=> tone(140, 0.10, {type:"square", gain:0.08}),
+  navigate: ()=> tone(440, 0.06, {type:"triangle", gain:0.10}),
+  hint:     ()=> sequence([{f:500,d:0.08,t:0},{f:700,d:0.10,t:0.08}]),
+  levelUp:  ()=> sequence([{f:392,d:0.09,t:0},{f:494,d:0.09,t:0.09},{f:587,d:0.16,t:0.18}]),
+  victory:  ()=> sequence([{f:523,d:0.11,t:0},{f:659,d:0.11,t:0.11},
+                            {f:784,d:0.11,t:0.22},{f:1047,d:0.28,t:0.33}]),
+  boss:     ()=> sequence([{f:196,d:0.14,t:0,type:"sawtooth"},{f:247,d:0.14,t:0.12,type:"sawtooth"},
+                            {f:294,d:0.30,t:0.24,type:"sawtooth"}]),
+};
+
+window.SL.Audio = {
+  unlock,
+  play(name){ if(SFX[name]) SFX[name](); },
+  setMuted(v){ muted = !!v; window.SL.Storage.setSound(!muted); },
+  isMuted(){ return muted; },
+};
+})();
+
+</script>
+<script>
+// The board screen: rendering, two-tap placement, sight overlay, conflicts,
+// the technique-aware hint engine (rewarded-ad gated), and level completion.
+(function(){
+"use strict";
+const R = window.SL.Rules, St = window.SL.Storage, A = window.SL.Analytics,
+      Ads = window.SL.Ads, Au = window.SL.Audio;
+const {H,W,N,PIECES,GLYPH,NAME,UNITS,SIGHT,rc,id:idOf,boxOf,coord,conflicts,candidates} = R;
+
+const board = document.getElementById("board");
+const rays  = document.getElementById("rays");
+let builtBoardDom = false;
+
+function buildBoardDom(){
+  if(builtBoardDom) return;
+  board.innerHTML = "";
+  for(let i=0;i<N;i++){
+    const[r,c]=rc(i);
+    const b=document.createElement("button");
+    b.type="button"; b.className="cell"+((r+c)%2?" dk":"")+
+      (c%3===2&&c<W-1?" bx-r":"")+(r%2===1&&r<H-1?" bx-b":"");
+    b.dataset.i=i; b.setAttribute("aria-label","square "+coord(i));
+    b.addEventListener("click",()=>onCell(i));
+    b.addEventListener("mouseenter",()=>{ if(sel===null){ hoverCell=i; render(); } });
+    b.addEventListener("mouseleave",()=>{ if(sel===null){ hoverCell=null; render(); } });
+    board.appendChild(b);
+  }
+  document.getElementById("coordsF").innerHTML =
+    [...R.FILES].map(f=>"<span>"+f+"</span>").join("");
+  document.getElementById("coordsR").innerHTML =
+    Array.from({length:H},(_,r)=>"<span>"+(H-r)+"</span>").join("");
+  builtBoardDom = true;
+}
+
+let level=null, grid=[], givens={}, sel=null, hoverCell=null, undo=[],
+    t0=null, tick=null, won=false, finalTimeMs=null, hintsThisRun=0, callbacks=null;
+
+function el(x){ return document.getElementById(x); }
+function fmt(ms){ const s=Math.max(0,Math.floor(ms/1000));
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+
+function nextLevel(){
+  const idx = window.SL.LEVELS.findIndex(l=>l.id===level.id);
+  return window.SL.LEVELS[idx+1] || null;
+}
+
+function say(html,cls){ const s=el("status"); s.className="status"+(cls?" "+cls:""); s.innerHTML=html; }
+
+function mount(lvl, cbs){
+  buildBoardDom();
+  level = lvl; callbacks = cbs;
+  givens={}; grid=new Array(N).fill(null); undo=[]; sel=null; hoverCell=null;
+  won=false; finalTimeMs=null; hintsThisRun=0;
+  Object.keys(lvl.givens).forEach(k=>{ givens[+k]=lvl.givens[k]; grid[+k]=lvl.givens[k]; });
+  t0=null; if(tick){clearInterval(tick); tick=null;} el("gameTimer").textContent="00:00";
+  el("victory").hidden=true; el("victoryActions").hidden=true;
+
+  const sectionName = (window.SL.SECTIONS[lvl.section]||{}).name || lvl.section;
+  el("gameLevelLabel").textContent = sectionName+" · "+lvl.label;
+  el("gameLevelSub").textContent = lvl.tag==="boss" ? "Boss level"
+    : lvl.tag==="miniboss" ? "Miniboss" : lvl.blurb;
+  say(lvl.blurb);
+  drawPalette(); render();
+
+  A.log("level_start", {level_id: lvl.id, section: lvl.section, clues: lvl.clues, tag: lvl.tag||"normal"});
+  if(lvl.tag==="boss") Au.play("boss");
+
+  if(lvl.tutorial && !St.getSeenTutorial()) startTutorial();
+  else el("tutorialOverlay").hidden = true;
+}
+function unmount(){
+  if(tick){ clearInterval(tick); tick=null; }
+  el("tutorialOverlay").hidden = true;
+}
+
+function startClock(){
+  if(t0) return;
+  t0=Date.now();
+  tick=setInterval(()=>{ el("gameTimer").textContent=fmt(Date.now()-t0); },1000);
+}
+
+/* ---------------- rendering ---------------- */
+function render(){
+  const {bad,msgs}=conflicts(grid);
+  const focus = sel!==null ? sel : hoverCell;
+  let lit=new Set(), hits=new Set(), litPiece=null;
+  if(focus!==null){
+    const p = grid[focus];
+    if(p){ litPiece=p; SIGHT[p][focus].forEach(j=>{ lit.add(j); if(grid[j]===p) hits.add(j); }); }
+  }
+  let filled=0;
+  for(let i=0;i<N;i++){
+    const cell=board.children[i], p=grid[i];
+    if(p) filled++;
+    const[r,c]=rc(i);
+    cell.className="cell"+((r+c)%2?" dk":"")+
+      (c%3===2&&c<W-1?" bx-r":"")+(r%2===1&&r<H-1?" bx-b":"")+
+      (i in givens?" given":p?" mine":"")+
+      (i===sel?" sel":"")+(lit.has(i)?" sight":"")+
+      (bad.has(i)?" bad":"")+
+      (tutorialStep===1&&i===tutorialTargetCell?" tut-target":"");
+    cell.innerHTML = p ? '<span class="pc">'+GLYPH[p]+"</span>" : "";
+  }
+  drawRays(lit, hits);
+  drawPalette();
+
+  const solved = filled===N && bad.size===0;
+  if(solved){
+    if(!won){
+      won=true;
+      finalTimeMs = t0 ? Date.now()-t0 : null;
+      if(finalTimeMs) el("gameTimer").textContent=fmt(finalTimeMs);
+      onSolved();
+    }
+  } else if(msgs.length){
+    say(msgs[0]+(msgs.length>1?" <em>(+"+(msgs.length-1)+" more)</em>":""),"err");
+  }
+}
+function drawRays(lit,hits){
+  rays.innerHTML="";
+  const svgns="http://www.w3.org/2000/svg";
+  lit.forEach(j=>{
+    const[r2,c2]=rc(j);
+    const ci=document.createElementNS(svgns,"circle");
+    ci.setAttribute("cx",c2*100+50); ci.setAttribute("cy",r2*100+50);
+    ci.setAttribute("r",9);
+    ci.setAttribute("class","dot"+(hits.has(j)?" bad":"")+(grid[j]?" on-piece":""));
+    rays.appendChild(ci);
+  });
+}
+function drawPalette(){
+  const pal=el("palette");
+  if(!pal.children.length){
+    PIECES.forEach(p=>{
+      const b=document.createElement("button");
+      b.type="button"; b.dataset.p=p;
+      b.innerHTML='<span class="left"></span><span class="g">'+GLYPH[p]+
+                  '</span><span class="k">'+p+"</span>";
+      b.addEventListener("click",()=>onPiece(p));
+      pal.appendChild(b);
+    });
+  }
+  [...pal.children].forEach(b=>{
+    const p=b.dataset.p, used=grid.filter(x=>x===p).length;
+    b.className="pbtn"+(used>=6?" done":"")+
+      (tutorialStep===2&&p===tutorialTargetPiece?" tut-target":"");
+    b.querySelector(".left").textContent=(6-used)+"×";
+  });
+}
+
+/* ---------------- interaction ---------------- */
+function onCell(i){
+  if(tutorialStep!=null) return tutorialCellTap(i);
+  if(i in givens){ sel=i; Au.play("select");
+    say("<strong>"+coord(i)+"</strong> is a clue — "+NAME[givens[i]].toLowerCase()+", fixed.");
+    render(); return; }
+  sel=(sel===i?null:i);
+  Au.play("select");
+  if(sel!==null){
+    const cd=candidates(grid,i);
+    say(cd.length? "<strong>"+coord(i)+"</strong> selected — tap a piece to place it. "+
+        "Still fits: "+cd.map(p=>NAME[p].toLowerCase()).join(", ")+"."
+      : "<strong>"+coord(i)+"</strong> has nothing left that fits — something earlier is wrong.");
+  }
+  render();
+}
+function onPiece(p){
+  if(tutorialStep!=null) return tutorialPieceTap(p);
+  if(sel===null){ window.SL.toast("Tap a square first, then tap a piece."); return; }
+  if(sel in givens){ window.SL.toast(coord(sel)+" is a fixed clue."); return; }
+  place(sel,p);
+}
+function place(i,p){
+  if(i in givens) return;
+  undo.push({i, prev:grid[i]});
+  grid[i]=(grid[i]===p?null:p);
+  sel=i; startClock();
+  const cf=conflicts(grid);
+  if(cf.bad.has(i)) Au.play("error");
+  else Au.play(grid[i] ? "place" : "clear");
+  if(!cf.bad.has(i)) say(grid[i]? NAME[p]+" to <strong>"+coord(i)+"</strong>." :
+                                  "<strong>"+coord(i)+"</strong> cleared.");
+  render();
+}
+function clearCell(i){ if(i in givens||!grid[i]) return;
+  undo.push({i,prev:grid[i]}); grid[i]=null; render(); }
+
+el("btnUndo").addEventListener("click",()=>{
+  const u=undo.pop(); if(!u){ window.SL.toast("Nothing to undo."); return; }
+  grid[u.i]=u.prev; sel=u.i; Au.play("navigate"); render();
+});
+el("btnReset").addEventListener("click",()=>{ if(level) mount(level, callbacks); });
+el("backBtn").addEventListener("click",()=>{ Au.play("navigate"); callbacks && callbacks.onExit(); });
+
+async function requestHint(){
+  if(tutorialStep!=null) return;
+  window.SL.toast("Watch a short video for a hint...");
+  const granted = await Ads.showRewarded();
+  if(!granted){ A.log("hint_declined", {level_id: level.id}); return; }
+  hintsThisRun++; St.addHintUsed(level.id);
+  A.log("hint_granted", {level_id: level.id});
+  Au.play("hint");
+  runHintLogic();
+}
+el("btnHint").addEventListener("click", requestHint);
+
+function runHintLogic(){
+  const sol = level.solution;
+  const wrong = grid.findIndex((p,i)=>p && !(i in givens) && p!==sol[i]);
+  if(wrong>=0){ sel=wrong;
+    say("Before anything else: the piece on <strong>"+coord(wrong)+"</strong> cannot be right. Take it off.","err");
+    render(); return; }
+  for(let i=0;i<N;i++){
+    if(grid[i]) continue;
+    const cd=candidates(grid,i);
+    if(cd.length===1){ sel=i;
+      say("Only one piece still fits <strong>"+coord(i)+"</strong>: the "+NAME[cd[0]].toLowerCase()+
+          ". Everything else is placed in its rank, file or box, or stands in its sight.");
+      render(); return; }
+    if(cd.length===0){ sel=i;
+      say("Nothing fits <strong>"+coord(i)+"</strong> any more — an earlier piece is wrong.","err");
+      render(); return; }
+  }
+  for(const u of UNITS){
+    for(const p of PIECES){
+      if(u.cells.some(i=>grid[i]===p)) continue;
+      const spots=u.cells.filter(i=>!grid[i]&&candidates(grid,i).includes(p));
+      if(spots.length===1){ sel=spots[0];
+        say("In <strong>"+u.name+"</strong> the "+NAME[p].toLowerCase()+
+            " has one square left: <strong>"+coord(spots[0])+"</strong>.");
+        render(); return; }
+      if(spots.length===0){
+        say("The "+NAME[p].toLowerCase()+" has nowhere to go in <strong>"+u.name+
+            "</strong>. Something earlier is wrong.","err"); return; }
+    }
+  }
+  const empty=[]; for(let i=0;i<N;i++) if(!grid[i]) empty.push(i);
+  if(empty.length){ const i=empty[0]; place(i,sol[i]); sel=i;
+    say("No plain single left, so here is one for free: "+NAME[sol[i]].toLowerCase()+
+        " on <strong>"+coord(i)+"</strong>."); return; }
+  say("Nothing obvious left to point at.");
+}
+
+/* ---------------- completion ---------------- */
+async function onSolved(){
+  if(tick){clearInterval(tick); tick=null;}
+  St.markComplete(level.id, finalTimeMs, hintsThisRun);
+  A.log("level_complete", {level_id: level.id, section: level.section,
+    time_ms: finalTimeMs, hints_used: hintsThisRun, tag: level.tag||"normal"});
+  Au.play("victory");
+  const wasFirstTutorial = level.tutorial && !St.getSeenTutorial();
+  if(level.tutorial) St.setSeenTutorial(true);
+
+  el("victoryTitle").textContent = level.tag==="boss" ? "Boss defeated" : "Victory";
+  el("vTime").textContent = finalTimeMs ? "solved in "+fmt(finalTimeMs) : "";
+  el("victory").hidden=false;
+  say('Every rank, file and box holds all six, and no piece sees its twin.',"win");
+
+  const total = St.totalCompleted();
+  await Ads.maybeInterstitial(total);
+
+  const nl = nextLevel();
+  el("btnNextLevel").hidden = !nl;
+  el("victoryActions").hidden = false;
+}
+el("btnLevelSelect").addEventListener("click", ()=>{ Au.play("navigate"); callbacks && callbacks.onAdvance(null); });
+el("btnNextLevel").addEventListener("click", ()=>{
+  Au.play("navigate");
+  const nl = nextLevel();
+  callbacks && callbacks.onAdvance(nl ? nl.id : null);
+});
+
+/* ---------------- keyboard (desktop testing convenience) ---------------- */
+document.addEventListener("keydown",e=>{
+  if(el("view-game").hidden) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const k=e.key.toUpperCase();
+  if(sel===null&&["ARROWUP","ARROWDOWN","ARROWLEFT","ARROWRIGHT"].includes(k)) sel=0;
+  else if(sel!==null){
+    let[r,c]=rc(sel), moved=true;
+    if(k==="ARROWUP") r=(r+H-1)%H; else if(k==="ARROWDOWN") r=(r+1)%H;
+    else if(k==="ARROWLEFT") c=(c+W-1)%W; else if(k==="ARROWRIGHT") c=(c+1)%W;
+    else moved=false;
+    if(moved){ sel=idOf(r,c); e.preventDefault(); render(); return; }
+  }
+  if(sel===null) return;
+  if(PIECES.includes(k)){ onPiece(k); e.preventDefault(); }
+  else if("123456".includes(k)){ onPiece(PIECES[+k-1]); e.preventDefault(); }
+  else if(k==="BACKSPACE"||k==="DELETE"){ clearCell(sel); e.preventDefault(); }
+  else if(k==="ESCAPE"){ sel=null; render(); }
+});
+
+/* ---------------- tutorial (level "on-1" only, shown once) ---------------- */
+let tutorialStep = null, tutorialTargetCell = null, tutorialTargetPiece = null;
+
+function findTeachingCell(){
+  for(let i=0;i<N;i++){
+    if(grid[i]) continue;
+    const cd = candidates(grid,i);
+    if(cd.length===1) return {cell:i, piece:cd[0]};
+  }
+  return null;
+}
+const TUT_TEXT = {
+  intro: "Sightlines is chess and sudoku in one board. Every rank, file and box needs " +
+         "all six pieces — and no piece may see another of its own kind.",
+  sight: "See the dots? They mark every square this piece can see. Two pieces of the " +
+         "same kind can never share one.",
+  sudoku: "The rest is sudoku: every rank, file and 2×3 box still needs all six pieces, " +
+          "exactly once each.",
+  outro: "That's the whole game. Finish the rest of this board on your own."
+};
+function tutorialRender(){
+  const overlay = el("tutorialOverlay"), card = el("tutorialCard");
+  overlay.hidden = false;
+  let html = "", isAction = false;
+  if(tutorialStep===0){
+    html = "<p>"+TUT_TEXT.intro+"</p><button type=\"button\" class=\"btn key\" id=\"tutNext\">Show me</button>";
+  } else if(tutorialStep===1){
+    html = "<p>Tap the highlighted square.</p>"; isAction = true;
+  } else if(tutorialStep===2){
+    html = "<p>Only the <strong>"+NAME[tutorialTargetPiece]+"</strong> fits here. Tap it below.</p>"; isAction = true;
+  } else if(tutorialStep===3){
+    html = "<p>"+TUT_TEXT.sight+"</p><button type=\"button\" class=\"btn key\" id=\"tutNext\">Got it</button>";
+  } else if(tutorialStep===4){
+    html = "<p>"+TUT_TEXT.sudoku+"</p><button type=\"button\" class=\"btn key\" id=\"tutNext\">Got it</button>";
+  } else if(tutorialStep===5){
+    html = "<p>"+TUT_TEXT.outro+"</p><button type=\"button\" class=\"btn key\" id=\"tutFinish\">Play</button>";
+  }
+  card.innerHTML = html;
+  overlay.classList.toggle("no-scrim", isAction);
+  const nextBtn = el("tutNext"); if(nextBtn) nextBtn.addEventListener("click", ()=>advanceTutorial());
+  const finishBtn = el("tutFinish"); if(finishBtn) finishBtn.addEventListener("click", ()=>endTutorial());
+
+  document.querySelectorAll(".cell.tut-target").forEach(c=>c.classList.remove("tut-target"));
+  document.querySelectorAll(".pbtn.tut-target").forEach(c=>c.classList.remove("tut-target"));
+  if(tutorialStep===1 && tutorialTargetCell!=null) board.children[tutorialTargetCell].classList.add("tut-target");
+  if(tutorialStep===2 && tutorialTargetPiece){
+    document.querySelector('.pbtn[data-p="'+tutorialTargetPiece+'"]').classList.add("tut-target");
+  }
+  A.log("tutorial_step", {step: tutorialStep});
+}
+function advanceTutorial(){ tutorialStep++; tutorialRender(); }
+function startTutorial(){
+  const teach = findTeachingCell();
+  tutorialTargetCell = teach ? teach.cell : null;
+  tutorialTargetPiece = teach ? teach.piece : null;
+  tutorialStep = 0;
+  tutorialRender();
+}
+function endTutorial(){
+  tutorialStep=null; tutorialTargetCell=null; tutorialTargetPiece=null;
+  el("tutorialOverlay").hidden=true;
+  el("tutorialOverlay").classList.remove("no-scrim");
+  St.setSeenTutorial(true);
+  A.log("tutorial_completed", {});
+  render();
+}
+function tutorialCellTap(i){
+  onCellReal(i);
+  if(i===tutorialTargetCell){ sel=i; render(); advanceTutorial(); }
+}
+function tutorialPieceTap(p){
+  if(p===tutorialTargetPiece && sel===tutorialTargetCell){
+    place(sel,p);
+    setTimeout(()=>advanceTutorial(), 350);
+  } else {
+    window.SL.toast("Try the highlighted piece.");
+  }
+}
+// the tutorial still needs plain cell-select behaviour underneath its gating
+function onCellReal(i){
+  if(i in givens) return;
+  sel=(sel===i?null:i);
+  render();
+}
+
+window.SL.Game = {mount, unmount};
+})();
+
+</script>
+<script>
+// Saga-style level select: four themed chapters, sequential unlock, a
+// skip-ahead escape hatch on each chapter barrier, miniboss/boss markers.
+(function(){
+"use strict";
+const St = window.SL.Storage, A = window.SL.Analytics, Au = window.SL.Audio;
+const SECTION_ORDER = ["onboarding","earlygame","midgame","endgame"];
+const LANES = ["lane-l","lane-c","lane-r","lane-c"];
+
+const ICON_MINIBOSS =
+  '<svg viewBox="0 0 24 24" class="node-icon"><path d="M12 3 4 7v5c0 4.6 3.4 8.2 8 9 4.6-.8 8-4.4 8-9V7l-8-4Z" ' +
+  'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+  '<path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const ICON_BOSS =
+  '<svg viewBox="0 0 24 24" class="node-icon"><path d="M3 8l3 3 3.5-5L12 11l2.5-5L18 9l3-3-1.6 10H4.6L3 8Z" ' +
+  'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>' +
+  '<path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const ICON_CHECK =
+  '<svg viewBox="0 0 24 24" class="node-check"><path d="M4 12.5 9.5 18 20 6" fill="none" ' +
+  'stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ICON_LOCK =
+  '<svg viewBox="0 0 24 24" class="node-lock"><rect x="5" y="10.5" width="14" height="9.5" rx="1.6" ' +
+  'fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" ' +
+  'stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+function levelsBySection(){
+  const bySec = {};
+  window.SL.LEVELS.forEach((lvl,idx)=>{ (bySec[lvl.section]=bySec[lvl.section]||[]).push({lvl,idx}); });
+  return bySec;
+}
+function isUnlocked(idx){
+  const arr = window.SL.LEVELS;
+  if(idx===0) return true;
+  const lvl = arr[idx];
+  const prevDone = St.isComplete(arr[idx-1].id);
+  const skipUsed = lvl.local===1 && St.hasSkip(lvl.section);
+  return prevDone || skipUsed;
+}
+function nextPlayableId(){
+  const arr = window.SL.LEVELS;
+  for(let i=0;i<arr.length;i++) if(isUnlocked(i) && !St.isComplete(arr[i].id)) return arr[i].id;
+  return null;
+}
+
+function nodeHtml(lvl, idx){
+  const unlocked = isUnlocked(idx), done = St.isComplete(lvl.id);
+  const isNext = lvl.id === window._slNextPlayable;
+  const cls = ["level-node", LANES[idx % LANES.length]];
+  if(!unlocked) cls.push("locked");
+  if(done) cls.push("done");
+  if(lvl.tag==="boss") cls.push("boss");
+  if(lvl.tag==="miniboss") cls.push("miniboss");
+  if(isNext) cls.push("next-up");
+  let icon = "";
+  if(done) icon = ICON_CHECK;
+  else if(!unlocked) icon = ICON_LOCK;
+  else if(lvl.tag==="boss") icon = ICON_BOSS;
+  else if(lvl.tag==="miniboss") icon = ICON_MINIBOSS;
+  return '<button type="button" class="'+cls.join(" ")+'" data-id="'+lvl.id+'" '+
+    (unlocked?'':'aria-disabled="true"')+'>'+
+    '<span class="node-num">'+lvl.label+'</span>'+
+    (icon?'<span class="node-badge">'+icon+'</span>':'')+
+    '</button>';
+}
+
+function barrierHtml(fromKey, toKey){
+  const arr = window.SL.LEVELS;
+  const toStartIdx = arr.findIndex(l=>l.section===toKey && l.local===1);
+  const passed = isUnlocked(toStartIdx);
+  const toName = window.SL.SECTIONS[toKey].name;
+  const fromName = window.SL.SECTIONS[fromKey].name;
+  const fromHasBoss = arr.some(l=>l.section===fromKey && l.tag==="boss");
+  const openLine = fromHasBoss ? "Beat "+fromName+"'s boss to open "+toName
+                                : "Finish "+fromName+" to open "+toName;
+  if(passed){
+    return '<div class="chapter-divider" data-passed="1"><span>'+toName+'</span></div>';
+  }
+  return '<div class="chapter-barrier" data-from="'+fromKey+'" data-to="'+toKey+'">'+
+    '<div class="barrier-lock">'+ICON_LOCK+'</div>'+
+    '<div class="barrier-text">'+openLine+'</div>'+
+    '<button type="button" class="barrier-skip" data-to="'+toKey+'" data-from="'+fromName+'" data-toname="'+toName+'">'+
+    'Skip ahead</button></div>';
+}
+
+function render(){
+  window._slNextPlayable = nextPlayableId();
+  const bySec = levelsBySection();
+  const root = document.getElementById("sagaScroll");
+  let html = "";
+  SECTION_ORDER.forEach((key, si)=>{
+    const meta = window.SL.SECTIONS[key];
+    const rows = bySec[key];
+    const doneCount = rows.filter(r=>St.isComplete(r.lvl.id)).length;
+    html += '<section class="section-band section-'+key+'">' +
+      '<div class="section-header"><div class="section-eyebrow">Chapter '+(si+1)+' of 4</div>'+
+      '<h2>'+meta.name+'</h2>'+
+      '<div class="section-progress">'+doneCount+' / '+rows.length+' cleared</div></div>'+
+      '<div class="node-path">' +
+      rows.map(({lvl,idx})=>nodeHtml(lvl,idx)).join('<div class="node-connector"></div>') +
+      '</div></section>';
+    if(si < SECTION_ORDER.length-1) html += barrierHtml(key, SECTION_ORDER[si+1]);
+  });
+  root.innerHTML = html;
+
+  const total = window.SL.LEVELS.length;
+  const done = window.SL.LEVELS.filter(l=>St.isComplete(l.id)).length;
+  document.getElementById("progressChip").textContent = done+" / "+total;
+
+  root.querySelectorAll(".level-node").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.dataset.id;
+      if(btn.classList.contains("locked")){
+        Au.play("locked");
+        window.SL.toast("Finish the level before this one first.");
+        return;
+      }
+      Au.play("navigate");
+      window.SL.Main.openLevel(id);
+    });
+  });
+  root.querySelectorAll(".barrier-skip").forEach(btn=>{
+    btn.addEventListener("click", ()=> openSkipModal(btn.dataset.to, btn.dataset.from, btn.dataset.toname));
+  });
+
+  if(window._slNextPlayable){
+    const target = root.querySelector('.level-node[data-id="'+window._slNextPlayable+'"]');
+    if(target) setTimeout(()=> target.scrollIntoView({block:"center", behavior:"instant"}), 0);
+  }
+}
+
+let pendingSkipTo = null;
+function openSkipModal(toKey, fromName, toName){
+  pendingSkipTo = toKey;
+  document.getElementById("skipTitle").textContent = "Skip to "+toName+"?";
+  document.getElementById("skipBody").textContent =
+    "You'll unlock "+toName+"'s first level right away. Levels you haven't beaten in "+
+    fromName+" stay locked until you go back and clear them. Only do this if "+fromName+
+    " is feeling too easy.";
+  document.getElementById("skipOverlay").hidden = false;
+  A.log("section_barrier_skip_tapped", {to_section: toKey});
+}
+document.getElementById("skipNo").addEventListener("click", ()=>{
+  document.getElementById("skipOverlay").hidden = true;
+  A.log("section_barrier_skip_cancelled", {to_section: pendingSkipTo});
+});
+document.getElementById("skipYes").addEventListener("click", ()=>{
+  St.setSkip(pendingSkipTo);
+  A.log("section_unlocked", {section: pendingSkipTo, via: "skip"});
+  document.getElementById("skipOverlay").hidden = true;
+  Au.play("levelUp");
+  render();
+});
+
+window.SL.Saga = {render};
+})();
+
+</script>
+<script>
+// App bootstrap: view routing between the saga map and the game screen,
+// the toast helper, and the one-time session_start analytics event.
+(function(){
+"use strict";
+const A = window.SL.Analytics;
+
+let toastTimer = null;
+window.SL.toast = function(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.hidden = false;
+  el.classList.remove("show"); void el.offsetWidth; el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.hidden = true; }, 1800);
+};
+
+const viewSaga = document.getElementById("view-saga");
+const viewGame = document.getElementById("view-game");
+
+function showSaga(){
+  window.SL.Ads.hideBanner();
+  window.SL.Game.unmount();
+  viewGame.hidden = true;
+  viewSaga.hidden = false;
+  window.SL.Saga.render();
+  window.SL.Ads.showBanner();
+  A.log("screen_view", {screen: "saga_map"});
+}
+function openLevel(levelId){
+  const level = window.SL.LEVELS.find(l=>l.id===levelId);
+  if(!level) return;
+  viewSaga.hidden = true;
+  viewGame.hidden = false;
+  window.SL.Game.mount(level, {
+    onExit: showSaga,
+    onAdvance: (nextId)=>{ if(nextId) openLevel(nextId); else showSaga(); },
+  });
+  A.log("screen_view", {screen: "game", level_id: levelId});
+}
+window.SL.Main = {showSaga, openLevel};
+
+document.getElementById("soundBtn").addEventListener("click", ()=>{
+  const muted = !window.SL.Audio.isMuted();
+  window.SL.Audio.setMuted(muted);
+  document.getElementById("soundBtn").classList.toggle("muted", muted);
+  window.SL.Audio.unlock();
+  if(!muted) window.SL.Audio.play("navigate");
+  A.log("settings_sound_toggled", {enabled: !muted});
+});
+document.getElementById("soundBtn").classList.toggle("muted", window.SL.Audio.isMuted());
+
+// unlock WebAudio on the very first tap anywhere (mobile autoplay policy)
+document.addEventListener("pointerdown", function unlock(){
+  window.SL.Audio.unlock();
+  document.removeEventListener("pointerdown", unlock);
+}, {once:true});
+
+window.SL.Ads.init();
+A.log("app_open", {level_count: window.SL.LEVELS.length});
+showSaga();
+})();
+
+</script>
+</body>
+</html>
