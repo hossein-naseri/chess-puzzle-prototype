@@ -3,14 +3,15 @@
 - **App ID (package name):** `com.lowpolyllamas.chessdoku`
 - **Firebase project:** `chessdoku-252ca`
 
-`google-services.json` in this folder is staged here because there's no
-Android project yet to put it in. Once we run `npx cap add android`, this
-file moves to `android/app/google-services.json` (Capacitor/Gradle's
-expected location) and the Firebase Analytics plugin gets added to
-`android/app/build.gradle`. At that point `js/analytics.js`'s `send()`
-function switches from `console.log` to the real
-`FirebaseAnalytics.logEvent(...)` call — see the TODO comment at the top of
-that file.
+**Wired in.** A copy now lives at `android/app/google-services.json`
+(Gradle's expected location — this copy here stays as the source of truth
+and a record of where it came from). `android/app/build.gradle` already
+applies the Google Services plugin conditionally whenever that file is
+present, so no manual Gradle edit was needed. `webapp/js/analytics.js`
+forwards every `SL.Analytics.log()` call to real Firebase Analytics
+whenever the app is running inside the native Capacitor shell (see
+`SAGA.md`'s "Ads & analytics: how the real wiring works" section) — in a
+plain browser it still just logs to the console, unchanged.
 
 Committing `google-services.json` to the repo is normal practice, not a
 leak: Google's own guidance is that it ships inside the public APK anyway

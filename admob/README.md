@@ -12,17 +12,21 @@ App: `com.lowpolyllamas.chessdoku`
 Tell App ID from an ad unit ID by the separator: `~` = App ID (one per
 app), `/` = ad unit ID (one per format).
 
-## Not wired into the app yet — on purpose
+## Wired in — but guarded off by default
 
-`js/ads.js` still runs its simulated banner/interstitial/rewarded flow (see
-`SAGA.md`). There is currently no real AdMob SDK anywhere in this project —
-these IDs will be consumed once `@capacitor-community/admob` is installed as
-part of scaffolding the native Android project. Until then they're just
-staged here.
+`webapp/js/ads.js` calls the real `@capacitor-community/admob` plugin
+whenever the app is running inside the native Capacitor shell (see
+`SAGA.md`). A `TEST_MODE` constant at the top of that file currently forces
+every ad request to use **Google's public test ad unit IDs** (below) and
+`isTesting: true`, regardless of the real IDs above — so nothing here can
+serve or be clicked as a real ad, or risk your account, until someone
+deliberately flips `TEST_MODE` to `false` for a release build.
 
-When that wiring happens, the build defaults to **Google's public test ad
-unit IDs** (safe for anyone to tap, no registration needed) and only uses
-the real IDs above in a release build. Real-device test-mode registration
-(AdMob's per-device test-ad override for *real* ad unit IDs) is a separate,
-later step during native testing — not needed for anything up to that
-point.
+Google's test IDs in use today (safe for anyone to tap, no registration
+needed): App `ca-app-pub-3940256099942544~3347511713`, Banner
+`ca-app-pub-3940256099942544/6300978111`, Interstitial
+`ca-app-pub-3940256099942544/1033173712`, Rewarded
+`ca-app-pub-3940256099942544/5224354917`.
+
+In a plain browser (no native shell), `js/ads.js` still runs the original
+simulated banner/interstitial/rewarded flow, unchanged.

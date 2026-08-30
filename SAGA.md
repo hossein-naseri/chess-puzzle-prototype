@@ -86,76 +86,145 @@ Prologue → Open Game, for consistency — skipping past the last bit of
 onboarding is a real (if unlikely) case: a player who's already comfortable
 skipping II or III to get to the real game.
 
-## Screens & files (`webapp/`)
+## Project layout
 
 ```
-index.html          saga screen + game screen markup, both toggled by [hidden]
-css/styles.css       all styling: theme tokens, board, saga map, modals, ads, tutorial
-js/data.js           generated - SL.BOARD / SL.SECTIONS / SL.LEVELS
-js/rules.js          board geometry + chess-sudoku rule engine (pure functions)
-js/storage.js        progress persistence (localStorage today)
-js/analytics.js      analytics choke point (console + in-memory log today)
-js/ads.js            banner / interstitial / rewarded stubs (simulated today)
-js/audio.js          WebAudio synthesised sound effects
-js/game.js           board screen: render, two-tap placement, hints, tutorial, completion
-js/saga.js           level-select map: lock state, chapters, barriers, skip modal
-js/main.js           view router, boot sequence, toast helper
+webapp/index.html          saga screen + game screen markup, both toggled by [hidden]
+webapp/css/styles.css      all styling: theme tokens, board, saga map, modals, ads, tutorial
+webapp/js/native-bridge.js generated (see below) - the one non-plain-script file
+webapp/js/data.js          generated - SL.BOARD / SL.SECTIONS / SL.LEVELS
+webapp/js/rules.js         board geometry + chess-sudoku rule engine (pure functions)
+webapp/js/storage.js       progress persistence (localStorage today)
+webapp/js/analytics.js     analytics choke point - console + in-memory log, +Firebase natively
+webapp/js/ads.js           banner / interstitial / rewarded - simulated in-browser, +AdMob natively
+webapp/js/audio.js         WebAudio synthesised sound effects
+webapp/js/game.js          board screen: render, two-tap placement, hints, tutorial, completion
+webapp/js/saga.js          level-select map: lock state, chapters, barriers, skip modal
+webapp/js/main.js          view router, boot sequence, toast helper
+native-bridge/src/index.js the only file that imports an npm package (see below)
+android/                   the native Capacitor Android project (generated, then hand-edited)
+firebase/, admob/          credentials + what's wired where
 ```
 
-## Monetization (simulated, ready to wire up)
+## Ads & analytics: how the real wiring works
 
-- **Banner**: a fixed bottom bar, shown on both screens.
-- **Interstitial**: first fires once 2 levels are complete, then after every
-  level after that (`SL.Ads.maybeInterstitial(totalCompleted)` — called once
-  per level completion, right after the victory state is recorded and before
-  the victory buttons appear).
-- **Rewarded video**: every hint request goes through
-  `SL.Ads.showRewarded()`. Declining (skip, available after 2s) grants
-  nothing; watching the full simulated clip (5s) grants one hint from the
-  same technique-aware hint engine used throughout development.
+Real AdMob and Firebase Analytics are wired in. Both are **native SDKs** —
+they don't run inside a plain web page — so `js/ads.js` and
+`js/analytics.js` each carry two code paths and pick between them at load
+time by checking `Capacitor.isNativePlatform()`:
 
-All three are real UI flows with real timing today, just backed by a fake
-ad creative instead of a network SDK — so the cadence and UX can be judged
-before any account exists. Every call site in the game goes through
-`js/ads.js`; swapping in `@capacitor-community/admob` later means rewriting
-the bodies of the functions in that one file; nothing elsewhere changes.
-Read the comments at the top of `js/ads.js` for the exact swap points.
+- **In a plain browser** (this includes the shared `dist/sightlines.html`
+  preview): both fall back to the original simulated flow — a fake bottom
+  banner, a timed fake interstitial/rewarded modal, `console.log` for
+  events. Nothing about that path changed; it's still how you play-test in
+  a browser.
+- **Inside the native Capacitor shell**: real calls go out. Every hint
+  request plays a real rewarded ad; every level completion (from the 2nd
+  on) plays a real interstitial; a real adaptive banner sits at the bottom
+  of the screen.
 
-**Before shipping real ads**: interstitials mid-puzzle would be a mistake
-for a deduction game — they're gated to level *completion* only, never
-mid-solve, on purpose.
+**The native plugins are reached without a bundler.** Capacitor auto-
+registers every native plugin as a callable JS proxy, but the *documented*
+way to get that proxy in code is `import { AdMob } from
+'@capacitor-community/admob'` — and the rest of this app deliberately has
+no bundler, no imports, just plain `<script>` tags on a `window.SL`
+namespace. Rather than restructure the whole app around a bundler for two
+plugins, `native-bridge/src/index.js` is the *one* file that imports
+anything, and it's compiled once with esbuild into a plain script:
 
-## Analytics (stubbed, ready to wire up)
+```
+npm run build:native-bridge   # native-bridge/src/index.js -> webapp/js/native-bridge.js
+```
 
-Every event in the app goes through `SL.Analytics.log(name, params)` in
-`js/analytics.js`, which currently logs to the console and an in-memory
-ring buffer (inspect live via `SL.Analytics.history` in devtools). Events
-firing today: `app_open`, `screen_view`, `level_start`, `level_complete`,
-`hint_declined`, `hint_granted`, `tutorial_step`, `tutorial_completed`,
-`section_barrier_skip_tapped/cancelled`, `section_unlocked`,
-`settings_sound_toggled`, plus the ad lifecycle events
-(`interstitial_requested/shown/dismissed`,
-`rewarded_ad_requested/shown/completed/skipped`).
+That output is checked in (`webapp/js/native-bridge.js`, ~150KB) and loaded
+first in `index.html`, exposing `window.SL_NATIVE = {AdMob, FirebaseAnalytics,
+BannerAdSize, BannerAdPosition}`. `js/ads.js`/`js/analytics.js` just check
+whether that object exists and whether `Capacitor.isNativePlatform()` is
+true; in a browser tab it's always false, so behaviour there is provably
+unchanged (see "Testing performed" below). Re-run the build command above
+only if you upgrade either plugin or change what the bridge exposes.
 
-Read the comment at the top of `js/analytics.js` for the swap point to
-Firebase Analytics.
+**`TEST_MODE` in `js/ads.js`** (currently `true`) forces every native ad
+request onto Google's public test ad unit IDs, regardless of the real IDs
+staged in `admob/README.md` — so nothing can serve a real ad, or get your
+AdMob account flagged for your own testing clicks, until someone
+deliberately flips it to `false` for a release build. See
+`admob/README.md` for the exact IDs in play.
 
-## What you'll need to hand over next
+Interstitials are gated to level *completion* only, never mid-solve — the
+cadence spec (silent on level 1, fires from level 2 on) lives in
+`maybeInterstitial()` in `js/ads.js`, unchanged from the simulated version.
 
-Nothing was needed to build this slice — both integrations are fully
-simulated. To make them real:
+**Firebase Analytics** forwards through the same
+`SL.Analytics.log(name, params)` every screen already called — natively it
+also calls `FirebaseAnalytics.logEvent({name, params})`, with boolean
+params coerced to `0`/`1` first (GA4 event params are string/long/double
+only; there's no native boolean type, so passing one through unsanitised
+would either be silently dropped or mis-typed by the native bridge).
+
+Events firing today: `app_open`, `screen_open`, `level_start`,
+`level_complete`, `hint_declined`, `hint_granted`, `tutorial_step`,
+`tutorial_completed`, `section_barrier_skip_tapped/cancelled`,
+`section_unlocked`, `settings_sound_toggled`, plus the ad lifecycle events
+(`interstitial_requested/shown/dismissed/failed_to_load`,
+`rewarded_ad_requested/shown/completed/skipped/failed_to_load`). (Screen
+tracking uses the custom name `screen_open` rather than GA4's reserved
+`screen_view`, which has its own expected shape.)
+
+**Verified without a real device.** This sandbox has no Android SDK, so the
+native path can't be proven on an actual phone from here — but its logic
+was exercised against a scripted mock of the native plugin (fake
+`AdMob`/`FirebaseAnalytics` objects standing in for the real native
+bridge): confirmed the banner/interstitial/rewarded calls fire with the
+correct test ad unit IDs and `isTesting: true`; confirmed interstitial
+completion correctly waits for the native `Dismissed` event rather than
+resolving as soon as `showInterstitial()` is called; confirmed the
+rewarded flow only grants a hint when the native `Rewarded` event actually
+fires, not just on any dismissal; confirmed boolean event params arrive at
+`FirebaseAnalytics.logEvent` as `0`/`1`. What's still unverified is
+everything below the JS boundary — whether the Gradle build actually
+compiles, whether the manifest/plugin wiring is complete — see "Building
+the app for real" below.
+
+## Building the app for real
+
+This sandbox has Node, npm and Java, but no Android SDK — so the first real
+build has to happen in Android Studio (which handles first-time SDK setup
+itself) or CI. From a checkout of this repo:
+
+```
+npm install
+npm run build:native-bridge     # only needed after changing native-bridge/src
+npx cap sync android            # copies webapp/ into the native project, re-links plugins
+```
+
+Then either open `android/` in Android Studio and hit Run, or from a
+machine with the Android SDK installed:
+
+```
+cd android && ./gradlew assembleDebug
+```
+
+`android/app/google-services.json` and the AdMob App ID in
+`android/app/src/main/res/values/strings.xml` are already in place — no
+credentials to add before that first build.
+
+## Where things stand
 
 1. **Package name — locked in:** `com.lowpolyllamas.chessdoku`.
-2. **Firebase — done.** Project `chessdoku-252ca`, Android app registered,
-   `google-services.json` received and staged at `firebase/google-services.json`
-   (see `firebase/README.md`).
-3. **AdMob — in progress.** Need: the app's AdMob App ID, plus three ad unit
-   IDs (banner, interstitial, rewarded), all under the same package name.
-4. Both land for real as part of standing up the actual Capacitor project
-   (`npx cap add android`) — that's the next milestone once AdMob's IDs are
-   in hand, since ad/analytics *plugins* only function inside a native
-   shell, not a plain browser tab. `google-services.json` moves into
-   `android/app/` at that point.
+2. **Firebase — done and wired.** Project `chessdoku-252ca`; see `firebase/README.md`.
+3. **AdMob — done and wired**, behind `TEST_MODE = true`; see `admob/README.md`.
+4. **Native Android project — scaffolded** (`android/`), both plugins
+   installed and synced, manifest/Gradle config in place.
+5. **Not done yet, and can't be from this sandbox:** an actual compiled,
+   installed, running build on a device or emulator. That's the next real
+   milestone — see "Building the app for real" above. Once you've run it
+   once, the two things worth checking first are that the bottom banner
+   shows a real Google test-ad creative (not the "Advertisement" bar
+   placeholder from the browser preview) and that the console/logcat shows
+   `[analytics]` lines alongside real Firebase Analytics DebugView events.
+6. Play Console still isn't needed for any of this — only once you're
+   ready to upload a build to an internal testing track.
 
 ## Scope cuts made for this slice (flag if you want them back)
 

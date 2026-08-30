@@ -24,7 +24,7 @@ function showSaga(){
   viewSaga.hidden = false;
   window.SL.Saga.render();
   window.SL.Ads.showBanner();
-  A.log("screen_view", {screen: "saga_map"});
+  A.log("screen_open", {screen: "saga_map"});
 }
 function openLevel(levelId){
   const level = window.SL.LEVELS.find(l=>l.id===levelId);
@@ -35,7 +35,7 @@ function openLevel(levelId){
     onExit: showSaga,
     onAdvance: (nextId)=>{ if(nextId) openLevel(nextId); else showSaga(); },
   });
-  A.log("screen_view", {screen: "game", level_id: levelId});
+  A.log("screen_open", {screen: "game", level_id: levelId});
 }
 window.SL.Main = {showSaga, openLevel};
 
