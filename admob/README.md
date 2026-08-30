@@ -6,8 +6,8 @@ App: `com.lowpolyllamas.chessdoku`
 |---|---|
 | App ID | `ca-app-pub-7235972156134582~3977643103` |
 | Banner ad unit ID | `ca-app-pub-7235972156134582/7118434464` |
-| Interstitial ad unit ID | _pending_ |
-| Rewarded ad unit ID | _pending_ |
+| Interstitial ad unit ID | `ca-app-pub-7235972156134582/6310066476` |
+| Rewarded ad unit ID | `ca-app-pub-7235972156134582/6804890495` |
 
 Tell App ID from an ad unit ID by the separator: `~` = App ID (one per
 app), `/` = ad unit ID (one per format).
