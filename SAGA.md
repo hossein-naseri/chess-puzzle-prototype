@@ -145,16 +145,17 @@ Firebase Analytics.
 Nothing was needed to build this slice — both integrations are fully
 simulated. To make them real:
 
-1. **AdMob**: create an account, create ad units for banner/interstitial/
-   rewarded (Android), hand me the app ID + three ad unit IDs (test IDs are
-   fine to start). I'll wire them into `SL.Ads.configureAdMob(...)`.
-2. **Firebase**: create a project, enable Analytics, hand me
-   `google-services.json` (Android). I'll wire it into
-   `SL.Analytics.configureFirebase(...)`.
-3. Both of those land as part of standing up the actual Capacitor project
-   (`npx cap add android`) — that's the next real step once you're happy
-   with this slice, since ad/analytics *plugins* only function inside a
-   native shell, not a plain browser tab.
+1. **Package name — locked in:** `com.lowpolyllamas.chessdoku`.
+2. **Firebase — done.** Project `chessdoku-252ca`, Android app registered,
+   `google-services.json` received and staged at `firebase/google-services.json`
+   (see `firebase/README.md`).
+3. **AdMob — in progress.** Need: the app's AdMob App ID, plus three ad unit
+   IDs (banner, interstitial, rewarded), all under the same package name.
+4. Both land for real as part of standing up the actual Capacitor project
+   (`npx cap add android`) — that's the next milestone once AdMob's IDs are
+   in hand, since ad/analytics *plugins* only function inside a native
+   shell, not a plain browser tab. `google-services.json` moves into
+   `android/app/` at that point.
 
 ## Scope cuts made for this slice (flag if you want them back)
 
