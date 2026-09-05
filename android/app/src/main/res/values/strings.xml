@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Chessdoku</string>
+    <string name="title_activity_main">Chessdoku</string>
+    <string name="package_name">com.lowpolyllamas.chessdoku</string>
+    <string name="custom_url_scheme">com.lowpolyllamas.chessdoku</string>
+    <!-- AdMob App ID from apps.admob.com - Apps -> Chessdoku -> App settings -->
+    <string name="admob_app_id">ca-app-pub-7235972156134582~3977643103</string>
+</resources>

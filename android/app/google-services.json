@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "367719850829",
+    "project_id": "chessdoku-252ca",
+    "storage_bucket": "chessdoku-252ca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367719850829:android:f73c39b339e9a3543ccd04",
+        "android_client_info": {
+          "package_name": "com.lowpolyllamas.chessdoku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrXIxJm7CJoPmXrkhfP66sA9A83HQG6zs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
