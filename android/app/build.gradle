@@ -48,7 +48,12 @@ try {
     def servicesJSON = file('google-services.json')
     if (servicesJSON.text) {
         apply plugin: 'com.google.gms.google-services'
+        // Uploads crash symbol/mapping info at build time so Crashlytics
+        // reports show real method names and line numbers. Gated on the same
+        // file since Crashlytics needs the same Firebase project config.
+        apply plugin: 'com.google.firebase.crashlytics'
+        apply plugin: 'com.google.firebase.firebase-perf'
     }
 } catch(Exception e) {
-    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+    logger.info("google-services.json not found, google-services/crashlytics plugins not applied")
 }

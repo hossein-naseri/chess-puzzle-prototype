@@ -100,6 +100,7 @@ webapp/js/ads.js           banner / interstitial / rewarded - simulated in-brows
 webapp/js/audio.js         WebAudio synthesised sound effects
 webapp/js/game.js          board screen: render, two-tap placement, hints, tutorial, completion
 webapp/js/saga.js          level-select map: lock state, chapters, barriers, skip modal
+webapp/js/diagnostics.js   crash reporting + performance tracing - console only in browser, +Firebase natively
 webapp/js/main.js          view router, boot sequence, toast helper
 native-bridge/src/index.js the only file that imports an npm package (see below)
 android/                   the native Capacitor Android project (generated, then hand-edited)
@@ -161,6 +162,42 @@ also calls `FirebaseAnalytics.logEvent({name, params})`, with boolean
 params coerced to `0`/`1` first (GA4 event params are string/long/double
 only; there's no native boolean type, so passing one through unsanitised
 would either be silently dropped or mis-typed by the native bridge).
+
+**Crash reporting and performance** (`js/diagnostics.js`, `SL.Diagnostics`)
+wire in `@capacitor-firebase/crashlytics` and `@capacitor-firebase/performance`,
+real and enabled, not simulated:
+
+- A global `window.addEventListener('error'/'unhandledrejection', ...)`
+  forwards every uncaught JS error to `FirebaseCrashlytics.recordException()`.
+  This is necessary specifically *because* this app's logic runs as
+  JavaScript inside a WebView: Crashlytics's automatic collection only
+  catches a **native** (Java/Kotlin) fatal crash. A JS exception here
+  doesn't crash the native process — the WebView can sit on a broken screen
+  with Crashlytics seeing nothing at all — unless it's explicitly forwarded
+  as a non-fatal report, which is what this does.
+- One custom Performance trace, `level_solve`, starts when a level's timer
+  starts and stops on completion, tagged with `section` and `tag`
+  attributes so the Firebase Performance dashboard can break solve times
+  down by chapter and by miniboss/boss. It's a single shared trace name
+  across all 33 levels (not one name per level) so Performance aggregates
+  it statistically instead of fragmenting into 33 separate trace names.
+- An abandoned level (backed out of before solving) still stops its trace
+  on `unmount()`, so the next level opened always gets a fresh one — this
+  was an actual bug caught and fixed during testing: without that cleanup,
+  a level left mid-solve would permanently block every later trace from
+  ever starting again, since the "trace already active" flag never cleared.
+
+Native wiring: both plugins needed their Gradle plugin applied at the app
+module level (`android/app/build.gradle`, gated on the same
+`google-services.json` check as Google Services) in addition to the plugin
+classpaths in the root `android/build.gradle` — the Capacitor plugin
+modules ship the underlying Firebase SDK dependency but not this build-time
+instrumentation step. **The exact Gradle plugin versions pinned there were
+not verified against Maven Central** — this sandbox's network policy blocks
+that too, the same as `dl.google.com` and `support.google.com` earlier — so
+the GitHub Actions build (see "Building the app for real") is what actually
+proves they resolve, the same way it proved the AdMob/Analytics wiring
+compiles.
 
 Events firing today: `app_open`, `screen_open`, `level_start`,
 `level_complete`, `hint_declined`, `hint_granted`, `tutorial_step`,

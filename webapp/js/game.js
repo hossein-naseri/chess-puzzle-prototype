@@ -3,7 +3,7 @@
 (function(){
 "use strict";
 const R = window.SL.Rules, St = window.SL.Storage, A = window.SL.Analytics,
-      Ads = window.SL.Ads, Au = window.SL.Audio;
+      Ads = window.SL.Ads, Au = window.SL.Audio, Dx = window.SL.Diagnostics;
 const {H,W,N,PIECES,GLYPH,NAME,UNITS,SIGHT,rc,id:idOf,boxOf,coord,conflicts,candidates} = R;
 
 const board = document.getElementById("board");
@@ -70,12 +70,16 @@ function mount(lvl, cbs){
 function unmount(){
   if(tick){ clearInterval(tick); tick=null; }
   el("tutorialOverlay").hidden = true;
+  Dx.stopTrace("level_solve");   // no-op if already stopped by onSolved(); cleans up an abandoned attempt
 }
 
 function startClock(){
   if(t0) return;
   t0=Date.now();
   tick=setInterval(()=>{ el("gameTimer").textContent=fmt(Date.now()-t0); },1000);
+  Dx.startTrace("level_solve");
+  Dx.putAttribute("level_solve", "section", level.section);
+  Dx.putAttribute("level_solve", "tag", level.tag||"normal");
 }
 
 /* ---------------- rendering ---------------- */
@@ -243,6 +247,7 @@ function runHintLogic(){
 /* ---------------- completion ---------------- */
 async function onSolved(){
   if(tick){clearInterval(tick); tick=null;}
+  Dx.stopTrace("level_solve");
   St.markComplete(level.id, finalTimeMs, hintsThisRun);
   A.log("level_complete", {level_id: level.id, section: level.section,
     time_ms: finalTimeMs, hints_used: hintsThisRun, tag: level.tag||"normal"});

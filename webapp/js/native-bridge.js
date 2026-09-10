@@ -5,13 +5,13 @@
     if (err) throw err[0];
     try {
       return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-    } catch (e) {
-      throw err = [e], e;
+    } catch (e2) {
+      throw err = [e2], e2;
     }
   };
   var __export = (target, all) => {
-    for (var name4 in all)
-      __defProp(target, name4, { get: all[name4], enumerable: true });
+    for (var name5 in all)
+      __defProp(target, name5, { get: all[name5], enumerable: true });
   };
 
   // node_modules/@capacitor/core/dist/index.js
@@ -60,7 +60,7 @@
         };
         const getPluginHeader = (pluginName) => {
           var _a;
-          return (_a = cap.PluginHeaders) === null || _a === void 0 ? void 0 : _a.find((h) => h.name === pluginName);
+          return (_a = cap.PluginHeaders) === null || _a === void 0 ? void 0 : _a.find((h2) => h2.name === pluginName);
         };
         const handleError = (err) => win.console.error(err);
         const registeredPlugins = /* @__PURE__ */ new Map();
@@ -84,7 +84,7 @@
           const createPluginMethod = (impl, prop) => {
             var _a, _b;
             if (pluginHeader) {
-              const methodHeader = pluginHeader === null || pluginHeader === void 0 ? void 0 : pluginHeader.methods.find((m) => prop === m.name);
+              const methodHeader = pluginHeader === null || pluginHeader === void 0 ? void 0 : pluginHeader.methods.find((m2) => prop === m2.name);
               if (methodHeader) {
                 if (methodHeader.rtype === "promise") {
                   return (options) => cap.nativePromise(pluginName, prop.toString(), options);
@@ -103,20 +103,20 @@
           const createPluginMethodWrapper = (prop) => {
             let remove2;
             const wrapper = (...args) => {
-              const p = loadPluginImplementation().then((impl) => {
+              const p2 = loadPluginImplementation().then((impl) => {
                 const fn = createPluginMethod(impl, prop);
                 if (fn) {
-                  const p2 = fn(...args);
-                  remove2 = p2 === null || p2 === void 0 ? void 0 : p2.remove;
-                  return p2;
+                  const p3 = fn(...args);
+                  remove2 = p3 === null || p3 === void 0 ? void 0 : p3.remove;
+                  return p3;
                 } else {
                   throw new CapacitorException(`"${pluginName}.${prop}()" is not implemented on ${platform}`, ExceptionCode.Unimplemented);
                 }
               });
               if (prop === "addListener") {
-                p.remove = async () => remove2();
+                p2.remove = async () => remove2();
               }
-              return p;
+              return p2;
             };
             wrapper.toString = () => `${prop.toString()}() { [capacitor code] }`;
             Object.defineProperty(wrapper, "name", {
@@ -137,15 +137,15 @@
                 callbackId
               }, callback);
             };
-            const p = new Promise((resolve) => call.then(() => resolve({ remove: remove2 })));
-            p.remove = async () => {
+            const p2 = new Promise((resolve) => call.then(() => resolve({ remove: remove2 })));
+            p2.remove = async () => {
               console.warn(`Using addListener() without 'await' is deprecated.`);
               await remove2();
             };
-            return p;
+            return p2;
           };
           const proxy = new Proxy({}, {
-            get(_, prop) {
+            get(_2, prop) {
               switch (prop) {
                 // https://github.com/facebook/react/issues/20030
                 case "$$typeof":
@@ -207,8 +207,8 @@
             this.sendRetainedArgumentsForEvent(eventName);
           }
           const remove2 = async () => this.removeListener(eventName, listenerFunc);
-          const p = Promise.resolve({ remove: remove2 });
-          return p;
+          const p2 = Promise.resolve({ remove: remove2 });
+          return p2;
         }
         async removeAllListeners() {
           this.listeners = {};
@@ -352,7 +352,7 @@
       });
       normalizeHttpHeaders = (headers = {}) => {
         const originalKeys = Object.keys(headers);
-        const loweredKeys = Object.keys(headers).map((k) => k.toLocaleLowerCase());
+        const loweredKeys = Object.keys(headers).map((k2) => k2.toLocaleLowerCase());
         const normalized = loweredKeys.reduce((acc, key, index) => {
           acc[key] = headers[originalKeys[index]];
           return acc;
@@ -715,7 +715,7 @@
   function isIndexedDBAvailable() {
     try {
       return typeof indexedDB === "object";
-    } catch (e) {
+    } catch (e2) {
       return false;
     }
   }
@@ -770,22 +770,22 @@
         ptr = end + 1;
       }
       return result;
-    } catch (e) {
+    } catch (e2) {
       return template;
     }
   }
-  function deepEqual(a, b) {
-    if (a === b) {
+  function deepEqual(a2, b2) {
+    if (a2 === b2) {
       return true;
     }
-    const aKeys = Object.keys(a);
-    const bKeys = Object.keys(b);
-    for (const k of aKeys) {
-      if (!bKeys.includes(k)) {
+    const aKeys = Object.keys(a2);
+    const bKeys = Object.keys(b2);
+    for (const k2 of aKeys) {
+      if (!bKeys.includes(k2)) {
         return false;
       }
-      const aProp = a[k];
-      const bProp = b[k];
+      const aProp = a2[k2];
+      const bProp = b2[k2];
       if (isObject(aProp) && isObject(bProp)) {
         if (!deepEqual(aProp, bProp)) {
           return false;
@@ -794,8 +794,8 @@
         return false;
       }
     }
-    for (const k of bKeys) {
-      if (!aKeys.includes(k)) {
+    for (const k2 of bKeys) {
+      if (!aKeys.includes(k2)) {
         return false;
       }
     }
@@ -828,49 +828,49 @@
       init_postinstall();
       stringToByteArray$1 = function(str) {
         const out = [];
-        let p = 0;
-        for (let i = 0; i < str.length; i++) {
-          let c = str.charCodeAt(i);
-          if (c < 128) {
-            out[p++] = c;
-          } else if (c < 2048) {
-            out[p++] = c >> 6 | 192;
-            out[p++] = c & 63 | 128;
-          } else if ((c & 64512) === 55296 && i + 1 < str.length && (str.charCodeAt(i + 1) & 64512) === 56320) {
-            c = 65536 + ((c & 1023) << 10) + (str.charCodeAt(++i) & 1023);
-            out[p++] = c >> 18 | 240;
-            out[p++] = c >> 12 & 63 | 128;
-            out[p++] = c >> 6 & 63 | 128;
-            out[p++] = c & 63 | 128;
+        let p2 = 0;
+        for (let i2 = 0; i2 < str.length; i2++) {
+          let c2 = str.charCodeAt(i2);
+          if (c2 < 128) {
+            out[p2++] = c2;
+          } else if (c2 < 2048) {
+            out[p2++] = c2 >> 6 | 192;
+            out[p2++] = c2 & 63 | 128;
+          } else if ((c2 & 64512) === 55296 && i2 + 1 < str.length && (str.charCodeAt(i2 + 1) & 64512) === 56320) {
+            c2 = 65536 + ((c2 & 1023) << 10) + (str.charCodeAt(++i2) & 1023);
+            out[p2++] = c2 >> 18 | 240;
+            out[p2++] = c2 >> 12 & 63 | 128;
+            out[p2++] = c2 >> 6 & 63 | 128;
+            out[p2++] = c2 & 63 | 128;
           } else {
-            out[p++] = c >> 12 | 224;
-            out[p++] = c >> 6 & 63 | 128;
-            out[p++] = c & 63 | 128;
+            out[p2++] = c2 >> 12 | 224;
+            out[p2++] = c2 >> 6 & 63 | 128;
+            out[p2++] = c2 & 63 | 128;
           }
         }
         return out;
       };
       byteArrayToString = function(bytes) {
         const out = [];
-        let pos = 0, c = 0;
+        let pos = 0, c2 = 0;
         while (pos < bytes.length) {
           const c1 = bytes[pos++];
           if (c1 < 128) {
-            out[c++] = String.fromCharCode(c1);
+            out[c2++] = String.fromCharCode(c1);
           } else if (c1 > 191 && c1 < 224) {
-            const c2 = bytes[pos++];
-            out[c++] = String.fromCharCode((c1 & 31) << 6 | c2 & 63);
+            const c22 = bytes[pos++];
+            out[c2++] = String.fromCharCode((c1 & 31) << 6 | c22 & 63);
           } else if (c1 > 239 && c1 < 365) {
-            const c2 = bytes[pos++];
+            const c22 = bytes[pos++];
             const c3 = bytes[pos++];
             const c4 = bytes[pos++];
-            const u = ((c1 & 7) << 18 | (c2 & 63) << 12 | (c3 & 63) << 6 | c4 & 63) - 65536;
-            out[c++] = String.fromCharCode(55296 + (u >> 10));
-            out[c++] = String.fromCharCode(56320 + (u & 1023));
+            const u2 = ((c1 & 7) << 18 | (c22 & 63) << 12 | (c3 & 63) << 6 | c4 & 63) - 65536;
+            out[c2++] = String.fromCharCode(55296 + (u2 >> 10));
+            out[c2++] = String.fromCharCode(56320 + (u2 & 1023));
           } else {
-            const c2 = bytes[pos++];
+            const c22 = bytes[pos++];
             const c3 = bytes[pos++];
-            out[c++] = String.fromCharCode((c1 & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+            out[c2++] = String.fromCharCode((c1 & 15) << 12 | (c22 & 63) << 6 | c3 & 63);
           }
         }
         return out.join("");
@@ -935,12 +935,12 @@
           this.init_();
           const byteToCharMap = webSafe ? this.byteToCharMapWebSafe_ : this.byteToCharMap_;
           const output = [];
-          for (let i = 0; i < input.length; i += 3) {
-            const byte1 = input[i];
-            const haveByte2 = i + 1 < input.length;
-            const byte2 = haveByte2 ? input[i + 1] : 0;
-            const haveByte3 = i + 2 < input.length;
-            const byte3 = haveByte3 ? input[i + 2] : 0;
+          for (let i2 = 0; i2 < input.length; i2 += 3) {
+            const byte1 = input[i2];
+            const haveByte2 = i2 + 1 < input.length;
+            const byte2 = haveByte2 ? input[i2 + 1] : 0;
+            const haveByte3 = i2 + 2 < input.length;
+            const byte3 = haveByte3 ? input[i2 + 2] : 0;
             const outByte1 = byte1 >> 2;
             const outByte2 = (byte1 & 3) << 4 | byte2 >> 4;
             let outByte3 = (byte2 & 15) << 2 | byte3 >> 6;
@@ -1002,17 +1002,17 @@
           this.init_();
           const charToByteMap = webSafe ? this.charToByteMapWebSafe_ : this.charToByteMap_;
           const output = [];
-          for (let i = 0; i < input.length; ) {
-            const byte1 = charToByteMap[input.charAt(i++)];
-            const haveByte2 = i < input.length;
-            const byte2 = haveByte2 ? charToByteMap[input.charAt(i)] : 0;
-            ++i;
-            const haveByte3 = i < input.length;
-            const byte3 = haveByte3 ? charToByteMap[input.charAt(i)] : 64;
-            ++i;
-            const haveByte4 = i < input.length;
-            const byte4 = haveByte4 ? charToByteMap[input.charAt(i)] : 64;
-            ++i;
+          for (let i2 = 0; i2 < input.length; ) {
+            const byte1 = charToByteMap[input.charAt(i2++)];
+            const haveByte2 = i2 < input.length;
+            const byte2 = haveByte2 ? charToByteMap[input.charAt(i2)] : 0;
+            ++i2;
+            const haveByte3 = i2 < input.length;
+            const byte3 = haveByte3 ? charToByteMap[input.charAt(i2)] : 64;
+            ++i2;
+            const haveByte4 = i2 < input.length;
+            const byte4 = haveByte4 ? charToByteMap[input.charAt(i2)] : 64;
+            ++i2;
             if (byte1 == null || byte2 == null || byte3 == null || byte4 == null) {
               throw new DecodeBase64StringError();
             }
@@ -1040,14 +1040,14 @@
             this.charToByteMap_ = {};
             this.byteToCharMapWebSafe_ = {};
             this.charToByteMapWebSafe_ = {};
-            for (let i = 0; i < this.ENCODED_VALS.length; i++) {
-              this.byteToCharMap_[i] = this.ENCODED_VALS.charAt(i);
-              this.charToByteMap_[this.byteToCharMap_[i]] = i;
-              this.byteToCharMapWebSafe_[i] = this.ENCODED_VALS_WEBSAFE.charAt(i);
-              this.charToByteMapWebSafe_[this.byteToCharMapWebSafe_[i]] = i;
-              if (i >= this.ENCODED_VALS_BASE.length) {
-                this.charToByteMap_[this.ENCODED_VALS_WEBSAFE.charAt(i)] = i;
-                this.charToByteMapWebSafe_[this.ENCODED_VALS.charAt(i)] = i;
+            for (let i2 = 0; i2 < this.ENCODED_VALS.length; i2++) {
+              this.byteToCharMap_[i2] = this.ENCODED_VALS.charAt(i2);
+              this.charToByteMap_[this.byteToCharMap_[i2]] = i2;
+              this.byteToCharMapWebSafe_[i2] = this.ENCODED_VALS_WEBSAFE.charAt(i2);
+              this.charToByteMapWebSafe_[this.byteToCharMapWebSafe_[i2]] = i2;
+              if (i2 >= this.ENCODED_VALS_BASE.length) {
+                this.charToByteMap_[this.ENCODED_VALS_WEBSAFE.charAt(i2)] = i2;
+                this.charToByteMapWebSafe_[this.ENCODED_VALS.charAt(i2)] = i2;
               }
             }
           }
@@ -1069,8 +1069,8 @@
       base64Decode = function(str) {
         try {
           return base64.decodeString(str, true);
-        } catch (e) {
-          console.error("base64Decode failed: ", e);
+        } catch (e2) {
+          console.error("base64Decode failed: ", e2);
         }
         return null;
       };
@@ -1091,7 +1091,7 @@
         let match;
         try {
           match = document.cookie.match(/__FIREBASE_DEFAULTS__=([^;]+)/);
-        } catch (e) {
+        } catch (e2) {
           return;
         }
         const decoded = match && base64Decode(match[1]);
@@ -1100,8 +1100,8 @@
       getDefaults = () => {
         try {
           return getDefaultsFromPostinstall() || getDefaultsFromGlobal() || getDefaultsFromEnvVariable() || getDefaultsFromCookie();
-        } catch (e) {
-          console.info(`Unable to get __FIREBASE_DEFAULTS__ due to: ${e}`);
+        } catch (e2) {
+          console.info(`Unable to get __FIREBASE_DEFAULTS__ due to: ${e2}`);
           return;
         }
       };
@@ -1195,8 +1195,8 @@
          * @param instanceFactory Service factory responsible for creating the public interface
          * @param type whether the service provided by the component is public or private
          */
-        constructor(name4, instanceFactory, type) {
-          this.name = name4;
+        constructor(name5, instanceFactory, type) {
+          this.name = name5;
           this.instanceFactory = instanceFactory;
           this.type = type;
           this.multipleInstances = false;
@@ -1223,8 +1223,8 @@
       };
       DEFAULT_ENTRY_NAME = "[DEFAULT]";
       Provider = class {
-        constructor(name4, container) {
-          this.name = name4;
+        constructor(name5, container) {
+          this.name = name5;
           this.container = container;
           this.component = null;
           this.instances = /* @__PURE__ */ new Map();
@@ -1249,7 +1249,7 @@
                 if (instance) {
                   deferred.resolve(instance);
                 }
-              } catch (e) {
+              } catch (e2) {
               }
             }
           }
@@ -1263,11 +1263,11 @@
               return this.getOrInitializeService({
                 instanceIdentifier: normalizedIdentifier
               });
-            } catch (e) {
+            } catch (e2) {
               if (optional) {
                 return null;
               } else {
-                throw e;
+                throw e2;
               }
             }
           } else {
@@ -1295,7 +1295,7 @@
           if (isComponentEager(component)) {
             try {
               this.getOrInitializeService({ instanceIdentifier: DEFAULT_ENTRY_NAME });
-            } catch (e) {
+            } catch (e2) {
             }
           }
           for (const [instanceIdentifier, instanceDeferred] of this.instancesDeferred.entries()) {
@@ -1305,7 +1305,7 @@
                 instanceIdentifier: normalizedIdentifier
               });
               instanceDeferred.resolve(instance);
-            } catch (e) {
+            } catch (e2) {
             }
           }
         }
@@ -1421,8 +1421,8 @@
         }
       };
       ComponentContainer = class {
-        constructor(name4) {
-          this.name = name4;
+        constructor(name5) {
+          this.name = name5;
           this.providers = /* @__PURE__ */ new Map();
         }
         /**
@@ -1455,12 +1455,12 @@
          * Firebase SDKs providing services should extend NameServiceMapping interface to register
          * themselves.
          */
-        getProvider(name4) {
-          if (this.providers.has(name4)) {
-            return this.providers.get(name4);
+        getProvider(name5) {
+          if (this.providers.has(name5)) {
+            return this.providers.get(name5);
           }
-          const provider = new Provider(name4, this);
-          this.providers.set(name4, provider);
+          const provider = new Provider(name5, this);
+          this.providers.set(name5, provider);
           return provider;
         }
         getProviders() {
@@ -1518,8 +1518,8 @@
          *
          * @param name The name that the logs will be associated with
          */
-        constructor(name4) {
-          this.name = name4;
+        constructor(name5) {
+          this.name = name5;
           this._logLevel = defaultLogLevel;
           this._logHandler = defaultLogHandler;
           this._userLogHandler = null;
@@ -1691,7 +1691,7 @@
   var instanceOfAny, idbProxyableTypes, cursorAdvanceMethods, cursorRequestMap, transactionDoneMap, transactionStoreNamesMap, transformCache, reverseTransformCache, idbProxyTraps, unwrap;
   var init_wrap_idb_value = __esm({
     "node_modules/idb/build/wrap-idb-value.js"() {
-      instanceOfAny = (object, constructors) => constructors.some((c) => object instanceof c);
+      instanceOfAny = (object, constructors) => constructors.some((c2) => object instanceof c2);
       cursorRequestMap = /* @__PURE__ */ new WeakMap();
       transactionDoneMap = /* @__PURE__ */ new WeakMap();
       transactionStoreNamesMap = /* @__PURE__ */ new WeakMap();
@@ -1727,8 +1727,8 @@
   });
 
   // node_modules/idb/build/index.js
-  function openDB(name4, version3, { blocked, upgrade, blocking, terminated } = {}) {
-    const request = indexedDB.open(name4, version3);
+  function openDB(name5, version4, { blocked, upgrade, blocking, terminated } = {}) {
+    const request = indexedDB.open(name5, version4);
     const openPromise = wrap(request);
     if (upgrade) {
       request.addEventListener("upgradeneeded", (event) => {
@@ -1805,8 +1805,8 @@
   function _addComponent(app, component) {
     try {
       app.container.addComponent(component);
-    } catch (e) {
-      logger.debug(`Component ${component.name} failed to register with FirebaseApp ${app.name}`, e);
+    } catch (e2) {
+      logger.debug(`Component ${component.name} failed to register with FirebaseApp ${app.name}`, e2);
     }
   }
   function _registerComponent(component) {
@@ -1824,28 +1824,28 @@
     }
     return true;
   }
-  function _getProvider(app, name4) {
+  function _getProvider(app, name5) {
     const heartbeatController = app.container.getProvider("heartbeat").getImmediate({ optional: true });
     if (heartbeatController) {
       void heartbeatController.triggerHeartbeat();
     }
-    return app.container.getProvider(name4);
+    return app.container.getProvider(name5);
   }
   function initializeApp(_options, rawConfig = {}) {
     let options = _options;
     if (typeof rawConfig !== "object") {
-      const name5 = rawConfig;
-      rawConfig = { name: name5 };
+      const name6 = rawConfig;
+      rawConfig = { name: name6 };
     }
     const config = {
       name: DEFAULT_ENTRY_NAME2,
       automaticDataCollectionEnabled: true,
       ...rawConfig
     };
-    const name4 = config.name;
-    if (typeof name4 !== "string" || !name4) {
+    const name5 = config.name;
+    if (typeof name5 !== "string" || !name5) {
       throw ERROR_FACTORY.create("bad-app-name", {
-        appName: String(name4)
+        appName: String(name5)
       });
     }
     options || (options = getDefaultAppConfig());
@@ -1855,18 +1855,18 @@
         /* AppError.NO_OPTIONS */
       );
     }
-    const existingApp = _apps.get(name4);
+    const existingApp = _apps.get(name5);
     if (existingApp) {
       if (!deepEqual(options, existingApp.options)) {
         throw ERROR_FACTORY.create("duplicate-app", {
-          appName: name4,
+          appName: name5,
           mismatchedParam: "options",
           oldValue: JSON.stringify(existingApp.options),
           newValue: JSON.stringify(options)
         });
       } else if (!deepEqual(config, existingApp.config)) {
         throw ERROR_FACTORY.create("duplicate-app", {
-          appName: name4,
+          appName: name5,
           mismatchedParam: "config",
           oldValue: JSON.stringify(existingApp.config),
           newValue: JSON.stringify(config)
@@ -1875,34 +1875,34 @@
         return existingApp;
       }
     }
-    const container = new ComponentContainer(name4);
+    const container = new ComponentContainer(name5);
     for (const component of _components.values()) {
       container.addComponent(component);
     }
     const newApp = new FirebaseAppImpl(options, config, container);
-    _apps.set(name4, newApp);
+    _apps.set(name5, newApp);
     return newApp;
   }
-  function getApp(name4 = DEFAULT_ENTRY_NAME2) {
-    const app = _apps.get(name4);
-    if (!app && name4 === DEFAULT_ENTRY_NAME2 && getDefaultAppConfig()) {
+  function getApp(name5 = DEFAULT_ENTRY_NAME2) {
+    const app = _apps.get(name5);
+    if (!app && name5 === DEFAULT_ENTRY_NAME2 && getDefaultAppConfig()) {
       return initializeApp();
     }
     if (!app) {
-      throw ERROR_FACTORY.create("no-app", { appName: name4 });
+      throw ERROR_FACTORY.create("no-app", { appName: name5 });
     }
     return app;
   }
-  function registerVersion(libraryKeyOrName, version3, variant) {
+  function registerVersion(libraryKeyOrName, version4, variant) {
     let library = PLATFORM_LOG_STRING[libraryKeyOrName] ?? libraryKeyOrName;
     if (variant) {
       library += `-${variant}`;
     }
     const libraryMismatch = library.match(/\s|\//);
-    const versionMismatch = version3.match(/\s|\//);
+    const versionMismatch = version4.match(/\s|\//);
     if (libraryMismatch || versionMismatch) {
       const warning = [
-        `Unable to register library "${library}" with version "${version3}":`
+        `Unable to register library "${library}" with version "${version4}":`
       ];
       if (libraryMismatch) {
         warning.push(`library name "${library}" contains illegal characters (whitespace or "/")`);
@@ -1911,14 +1911,14 @@
         warning.push("and");
       }
       if (versionMismatch) {
-        warning.push(`version name "${version3}" contains illegal characters (whitespace or "/")`);
+        warning.push(`version name "${version4}" contains illegal characters (whitespace or "/")`);
       }
       logger.warn(warning.join(" "));
       return;
     }
     _registerComponent(new Component(
       `${library}-version`,
-      () => ({ library, version: version3 }),
+      () => ({ library, version: version4 }),
       "VERSION"
       /* ComponentType.VERSION */
     ));
@@ -1931,14 +1931,14 @@
             case 0:
               try {
                 db.createObjectStore(STORE_NAME);
-              } catch (e) {
-                console.warn(e);
+              } catch (e2) {
+                console.warn(e2);
               }
           }
         }
-      }).catch((e) => {
+      }).catch((e2) => {
         throw ERROR_FACTORY.create("idb-open", {
-          originalErrorMessage: e.message
+          originalErrorMessage: e2.message
         });
       });
     }
@@ -1951,12 +1951,12 @@
       const result = await tx.objectStore(STORE_NAME).get(computeKey(app));
       await tx.done;
       return result;
-    } catch (e) {
-      if (e instanceof FirebaseError) {
-        logger.warn(e.message);
+    } catch (e2) {
+      if (e2 instanceof FirebaseError) {
+        logger.warn(e2.message);
       } else {
         const idbGetError = ERROR_FACTORY.create("idb-get", {
-          originalErrorMessage: e?.message
+          originalErrorMessage: e2?.message
         });
         logger.warn(idbGetError.message);
       }
@@ -1969,12 +1969,12 @@
       const objectStore = tx.objectStore(STORE_NAME);
       await objectStore.put(heartbeatObject, computeKey(app));
       await tx.done;
-    } catch (e) {
-      if (e instanceof FirebaseError) {
-        logger.warn(e.message);
+    } catch (e2) {
+      if (e2 instanceof FirebaseError) {
+        logger.warn(e2.message);
       } else {
         const idbGetError = ERROR_FACTORY.create("idb-set", {
-          originalErrorMessage: e?.message
+          originalErrorMessage: e2?.message
         });
         logger.warn(idbGetError.message);
       }
@@ -2027,10 +2027,10 @@
     }
     let earliestHeartbeatIdx = 0;
     let earliestHeartbeatDate = heartbeats[0].date;
-    for (let i = 1; i < heartbeats.length; i++) {
-      if (heartbeats[i].date < earliestHeartbeatDate) {
-        earliestHeartbeatDate = heartbeats[i].date;
-        earliestHeartbeatIdx = i;
+    for (let i2 = 1; i2 < heartbeats.length; i2++) {
+      if (heartbeats[i2].date < earliestHeartbeatDate) {
+        earliestHeartbeatDate = heartbeats[i2].date;
+        earliestHeartbeatIdx = i2;
       }
     }
     return earliestHeartbeatIdx;
@@ -2300,8 +2300,8 @@
               }
             }
             return this._storage.overwrite(this._heartbeatsCache);
-          } catch (e) {
-            logger.warn(e);
+          } catch (e2) {
+            logger.warn(e2);
           }
         }
         /**
@@ -2331,8 +2331,8 @@
               void this._storage.overwrite(this._heartbeatsCache);
             }
             return headerString;
-          } catch (e) {
-            logger.warn(e);
+          } catch (e2) {
+            logger.warn(e2);
             return "";
           }
         }
@@ -2541,8 +2541,8 @@
   function getBroadcastChannel() {
     if (!broadcastChannel && "BroadcastChannel" in self) {
       broadcastChannel = new BroadcastChannel("[Firebase] FID Change");
-      broadcastChannel.onmessage = (e) => {
-        callFidChangeCallbacks(e.data.key, e.data.fid);
+      broadcastChannel.onmessage = (e2) => {
+        callFidChangeCallbacks(e2.data.key, e2.data.fid);
       };
     }
     return broadcastChannel;
@@ -2660,8 +2660,8 @@
     try {
       const registeredInstallationEntry = await createInstallationRequest(installations, installationEntry);
       return set(installations.appConfig, registeredInstallationEntry);
-    } catch (e) {
-      if (isServerError(e) && e.customData.serverCode === 409) {
+    } catch (e2) {
+      if (isServerError(e2) && e2.customData.serverCode === 409) {
         await remove(installations.appConfig);
       } else {
         await set(installations.appConfig, {
@@ -2670,7 +2670,7 @@
           /* RequestStatus.NOT_STARTED */
         });
       }
-      throw e;
+      throw e2;
     }
   }
   async function waitUntilFidRegistration(installations) {
@@ -2821,8 +2821,8 @@
       };
       await set(installations.appConfig, updatedInstallationEntry);
       return authToken;
-    } catch (e) {
-      if (isServerError(e) && (e.customData.serverCode === 401 || e.customData.serverCode === 404)) {
+    } catch (e2) {
+      if (isServerError(e2) && (e2.customData.serverCode === 401 || e2.customData.serverCode === 404)) {
         await remove(installations.appConfig);
       } else {
         const updatedInstallationEntry = {
@@ -2834,7 +2834,7 @@
         };
         await set(installations.appConfig, updatedInstallationEntry);
       }
-      throw e;
+      throw e2;
     }
   }
   function isEntryRegistered(installationEntry) {
@@ -3017,7 +3017,7 @@
     return url;
   }
   function promiseAllSettled(promises) {
-    return Promise.all(promises.map((promise) => promise.catch((e) => e)));
+    return Promise.all(promises.map((promise) => promise.catch((e2) => e2)));
   }
   function createTrustedTypesPolicy(policyName, policyOptions) {
     let trustedTypesPolicy;
@@ -3057,8 +3057,8 @@
           await initializationPromisesMap2[foundConfig.appId];
         }
       }
-    } catch (e) {
-      logger2.error(e);
+    } catch (e2) {
+      logger2.error(e2);
     }
     gtagCore("config", measurementId, gtagParams);
   }
@@ -3073,9 +3073,9 @@
         const dynamicConfigResults = await promiseAllSettled(dynamicConfigPromisesList2);
         for (const sendToId of gaSendToList) {
           const foundConfig = dynamicConfigResults.find((config) => config.measurementId === sendToId);
-          const initializationPromise = foundConfig && initializationPromisesMap2[foundConfig.appId];
-          if (initializationPromise) {
-            initializationPromisesToWaitFor.push(initializationPromise);
+          const initializationPromise2 = foundConfig && initializationPromisesMap2[foundConfig.appId];
+          if (initializationPromise2) {
+            initializationPromisesToWaitFor.push(initializationPromise2);
           } else {
             initializationPromisesToWaitFor = [];
             break;
@@ -3087,8 +3087,8 @@
       }
       await Promise.all(initializationPromisesToWaitFor);
       gtagCore("event", measurementId, gtagParams || {});
-    } catch (e) {
-      logger2.error(e);
+    } catch (e2) {
+      logger2.error(e2);
     }
   }
   function wrapGtag(gtagCore, initializationPromisesMap2, dynamicConfigPromisesList2, measurementIdToAppId2) {
@@ -3112,8 +3112,8 @@
         } else {
           gtagCore(command, ...args);
         }
-      } catch (e) {
-        logger2.error(e);
+      } catch (e2) {
+        logger2.error(e2);
       }
     }
     return gtagWrapper;
@@ -3204,26 +3204,26 @@
     const { appId, measurementId } = appFields;
     try {
       await setAbortableTimeout(signal, throttleEndTimeMillis);
-    } catch (e) {
+    } catch (e2) {
       if (measurementId) {
-        logger2.warn(`Timed out fetching this Firebase app's measurement ID from the server. Falling back to the measurement ID ${measurementId} provided in the "measurementId" field in the local Firebase config. [${e?.message}]`);
+        logger2.warn(`Timed out fetching this Firebase app's measurement ID from the server. Falling back to the measurement ID ${measurementId} provided in the "measurementId" field in the local Firebase config. [${e2?.message}]`);
         return { appId, measurementId };
       }
-      throw e;
+      throw e2;
     }
     try {
       const response = await fetchDynamicConfig(appFields);
       retryData.deleteThrottleMetadata(appId);
       return response;
-    } catch (e) {
-      const error = e;
+    } catch (e2) {
+      const error = e2;
       if (!isRetriableError(error)) {
         retryData.deleteThrottleMetadata(appId);
         if (measurementId) {
           logger2.warn(`Failed to fetch this Firebase app's measurement ID from the server. Falling back to the measurement ID ${measurementId} provided in the "measurementId" field in the local Firebase config. [${error?.message}]`);
           return { appId, measurementId };
         } else {
-          throw e;
+          throw e2;
         }
       }
       const backoffMillis = Number(error?.customData?.httpStatus) === 503 ? calculateBackoffMillis(backoffCount, retryData.intervalMillis, LONG_RETRY_FACTOR) : calculateBackoffMillis(backoffCount, retryData.intervalMillis);
@@ -3248,19 +3248,19 @@
       });
     });
   }
-  function isRetriableError(e) {
-    if (!(e instanceof FirebaseError) || !e.customData) {
+  function isRetriableError(e2) {
+    if (!(e2 instanceof FirebaseError) || !e2.customData) {
       return false;
     }
-    const httpStatus = Number(e.customData["httpStatus"]);
+    const httpStatus = Number(e2.customData["httpStatus"]);
     return httpStatus === 429 || httpStatus === 500 || httpStatus === 503 || httpStatus === 504;
   }
-  async function logEvent$1(gtagFunction, initializationPromise, eventName, eventParams, options) {
+  async function logEvent$1(gtagFunction, initializationPromise2, eventName, eventParams, options) {
     if (options && options.global) {
       gtagFunction("event", eventName, eventParams);
       return;
     } else {
-      const measurementId = await initializationPromise;
+      const measurementId = await initializationPromise2;
       const params = {
         ...eventParams,
         "send_to": measurementId
@@ -3268,19 +3268,19 @@
       gtagFunction("event", eventName, params);
     }
   }
-  async function setUserId$1(gtagFunction, initializationPromise, id, options) {
+  async function setUserId$1(gtagFunction, initializationPromise2, id, options) {
     if (options && options.global) {
       gtagFunction("set", { "user_id": id });
       return Promise.resolve();
     } else {
-      const measurementId = await initializationPromise;
+      const measurementId = await initializationPromise2;
       gtagFunction("config", measurementId, {
         update: true,
         "user_id": id
       });
     }
   }
-  async function setUserProperties$1(gtagFunction, initializationPromise, properties, options) {
+  async function setUserProperties$1(gtagFunction, initializationPromise2, properties, options) {
     if (options && options.global) {
       const flatProperties = {};
       for (const key of Object.keys(properties)) {
@@ -3289,15 +3289,15 @@
       gtagFunction("set", flatProperties);
       return Promise.resolve();
     } else {
-      const measurementId = await initializationPromise;
+      const measurementId = await initializationPromise2;
       gtagFunction("config", measurementId, {
         update: true,
         "user_properties": properties
       });
     }
   }
-  async function setAnalyticsCollectionEnabled$1(initializationPromise, enabled) {
-    const measurementId = await initializationPromise;
+  async function setAnalyticsCollectionEnabled$1(initializationPromise2, enabled) {
+    const measurementId = await initializationPromise2;
     window[`ga-disable-${measurementId}`] = !enabled;
   }
   function _setConsentDefaultForInit(consentSettings) {
@@ -3315,9 +3315,9 @@
     } else {
       try {
         await validateIndexedDBOpenable();
-      } catch (e) {
+      } catch (e2) {
         logger2.warn(ERROR_FACTORY3.create("indexeddb-unavailable", {
-          errorInfo: e?.toString()
+          errorInfo: e2?.toString()
         }).message);
         return false;
       }
@@ -3331,7 +3331,7 @@
       if (app.options.measurementId && config.measurementId !== app.options.measurementId) {
         logger2.warn(`The measurement ID in the local Firebase config (${app.options.measurementId}) does not match the measurement ID fetched from the server (${config.measurementId}). To ensure analytics events are always sent to the correct Analytics property, update the measurement ID field in the local config or remove it from the local config.`);
       }
-    }).catch((e) => logger2.error(e));
+    }).catch((e2) => logger2.error(e2));
     dynamicConfigPromisesList2.push(dynamicConfigPromise);
     const fidPromise = validateIndexedDB().then((envIsValid) => {
       if (envIsValid) {
@@ -3442,19 +3442,19 @@
   }
   function setUserId(analyticsInstance, id, options) {
     analyticsInstance = getModularInstance(analyticsInstance);
-    setUserId$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], id, options).catch((e) => logger2.error(e));
+    setUserId$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], id, options).catch((e2) => logger2.error(e2));
   }
   function setUserProperties(analyticsInstance, properties, options) {
     analyticsInstance = getModularInstance(analyticsInstance);
-    setUserProperties$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], properties, options).catch((e) => logger2.error(e));
+    setUserProperties$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], properties, options).catch((e2) => logger2.error(e2));
   }
   function setAnalyticsCollectionEnabled(analyticsInstance, enabled) {
     analyticsInstance = getModularInstance(analyticsInstance);
-    setAnalyticsCollectionEnabled$1(initializationPromisesMap[analyticsInstance.app.options.appId], enabled).catch((e) => logger2.error(e));
+    setAnalyticsCollectionEnabled$1(initializationPromisesMap[analyticsInstance.app.options.appId], enabled).catch((e2) => logger2.error(e2));
   }
   function logEvent(analyticsInstance, eventName, eventParams, options) {
     analyticsInstance = getModularInstance(analyticsInstance);
-    logEvent$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], eventName, eventParams, options).catch((e) => logger2.error(e));
+    logEvent$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], eventName, eventParams, options).catch((e2) => logger2.error(e2));
   }
   function setConsent(consentSettings) {
     if (wrappedGtagFunction) {
@@ -3489,9 +3489,9 @@
           logEvent: (eventName, eventParams, options) => logEvent(analytics, eventName, eventParams, options),
           setUserProperties: (properties, options) => setUserProperties(analytics, properties, options)
         };
-      } catch (e) {
+      } catch (e2) {
         throw ERROR_FACTORY3.create("interop-component-reg-failed", {
-          reason: e
+          reason: e2
         });
       }
     }
@@ -3715,6 +3715,1693 @@
     }
   });
 
+  // node_modules/@capacitor-firebase/crashlytics/dist/esm/web.js
+  var web_exports3 = {};
+  __export(web_exports3, {
+    FirebaseCrashlyticsWeb: () => FirebaseCrashlyticsWeb
+  });
+  var FirebaseCrashlyticsWeb;
+  var init_web3 = __esm({
+    "node_modules/@capacitor-firebase/crashlytics/dist/esm/web.js"() {
+      init_dist();
+      FirebaseCrashlyticsWeb = class extends WebPlugin {
+        async crash() {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async setCustomKey(_options) {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async setUserId(_options) {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async log(_options) {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async setEnabled(_options) {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async isEnabled() {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async didCrashOnPreviousExecution() {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async sendUnsentReports() {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async deleteUnsentReports() {
+          throw this.unimplemented("Not implemented on web.");
+        }
+        async recordException(_options) {
+          throw this.unimplemented("Not implemented on web.");
+        }
+      };
+    }
+  });
+
+  // node_modules/web-vitals/dist/web-vitals.attribution.js
+  var t, e, n, r, i, a, o, c, u, s, f, d, l, m, p, v, g, h, T, y, E, S, b, L, C, M, D, x, I, k, A, F, P, B, O, R, j, q, H, N, W, z, U, V, _, G, J, K, Q, X, Y, nt, rt, it, at, ot;
+  var init_web_vitals_attribution = __esm({
+    "node_modules/web-vitals/dist/web-vitals.attribution.js"() {
+      n = function() {
+        var t2 = self.performance && performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+        if (t2 && t2.responseStart > 0 && t2.responseStart < performance.now()) return t2;
+      };
+      r = function(t2) {
+        if ("loading" === document.readyState) return "loading";
+        var e2 = n();
+        if (e2) {
+          if (t2 < e2.domInteractive) return "loading";
+          if (0 === e2.domContentLoadedEventStart || t2 < e2.domContentLoadedEventStart) return "dom-interactive";
+          if (0 === e2.domComplete || t2 < e2.domComplete) return "dom-content-loaded";
+        }
+        return "complete";
+      };
+      i = function(t2) {
+        var e2 = t2.nodeName;
+        return 1 === t2.nodeType ? e2.toLowerCase() : e2.toUpperCase().replace(/^#/, "");
+      };
+      a = function(t2, e2) {
+        var n2 = "";
+        try {
+          for (; t2 && 9 !== t2.nodeType; ) {
+            var r2 = t2, a2 = r2.id ? "#" + r2.id : i(r2) + (r2.classList && r2.classList.value && r2.classList.value.trim() && r2.classList.value.trim().length ? "." + r2.classList.value.trim().replace(/\s+/g, ".") : "");
+            if (n2.length + a2.length > (e2 || 100) - 1) return n2 || a2;
+            if (n2 = n2 ? a2 + ">" + n2 : a2, r2.id) break;
+            t2 = r2.parentNode;
+          }
+        } catch (t3) {
+        }
+        return n2;
+      };
+      o = -1;
+      c = function() {
+        return o;
+      };
+      u = function(t2) {
+        addEventListener("pageshow", (function(e2) {
+          e2.persisted && (o = e2.timeStamp, t2(e2));
+        }), true);
+      };
+      s = function() {
+        var t2 = n();
+        return t2 && t2.activationStart || 0;
+      };
+      f = function(t2, e2) {
+        var r2 = n(), i2 = "navigate";
+        c() >= 0 ? i2 = "back-forward-cache" : r2 && (document.prerendering || s() > 0 ? i2 = "prerender" : document.wasDiscarded ? i2 = "restore" : r2.type && (i2 = r2.type.replace(/_/g, "-")));
+        return { name: t2, value: void 0 === e2 ? -1 : e2, rating: "good", delta: 0, entries: [], id: "v4-".concat(Date.now(), "-").concat(Math.floor(8999999999999 * Math.random()) + 1e12), navigationType: i2 };
+      };
+      d = function(t2, e2, n2) {
+        try {
+          if (PerformanceObserver.supportedEntryTypes.includes(t2)) {
+            var r2 = new PerformanceObserver((function(t3) {
+              Promise.resolve().then((function() {
+                e2(t3.getEntries());
+              }));
+            }));
+            return r2.observe(Object.assign({ type: t2, buffered: true }, n2 || {})), r2;
+          }
+        } catch (t3) {
+        }
+      };
+      l = function(t2, e2, n2, r2) {
+        var i2, a2;
+        return function(o2) {
+          e2.value >= 0 && (o2 || r2) && ((a2 = e2.value - (i2 || 0)) || void 0 === i2) && (i2 = e2.value, e2.delta = a2, e2.rating = (function(t3, e3) {
+            return t3 > e3[1] ? "poor" : t3 > e3[0] ? "needs-improvement" : "good";
+          })(e2.value, n2), t2(e2));
+        };
+      };
+      m = function(t2) {
+        requestAnimationFrame((function() {
+          return requestAnimationFrame((function() {
+            return t2();
+          }));
+        }));
+      };
+      p = function(t2) {
+        document.addEventListener("visibilitychange", (function() {
+          "hidden" === document.visibilityState && t2();
+        }));
+      };
+      v = function(t2) {
+        var e2 = false;
+        return function() {
+          e2 || (t2(), e2 = true);
+        };
+      };
+      g = -1;
+      h = function() {
+        return "hidden" !== document.visibilityState || document.prerendering ? 1 / 0 : 0;
+      };
+      T = function(t2) {
+        "hidden" === document.visibilityState && g > -1 && (g = "visibilitychange" === t2.type ? t2.timeStamp : 0, E());
+      };
+      y = function() {
+        addEventListener("visibilitychange", T, true), addEventListener("prerenderingchange", T, true);
+      };
+      E = function() {
+        removeEventListener("visibilitychange", T, true), removeEventListener("prerenderingchange", T, true);
+      };
+      S = function() {
+        return g < 0 && (g = h(), y(), u((function() {
+          setTimeout((function() {
+            g = h(), y();
+          }), 0);
+        }))), { get firstHiddenTime() {
+          return g;
+        } };
+      };
+      b = function(t2) {
+        document.prerendering ? addEventListener("prerenderingchange", (function() {
+          return t2();
+        }), true) : t2();
+      };
+      L = [1800, 3e3];
+      C = function(t2, e2) {
+        e2 = e2 || {}, b((function() {
+          var n2, r2 = S(), i2 = f("FCP"), a2 = d("paint", (function(t3) {
+            t3.forEach((function(t4) {
+              "first-contentful-paint" === t4.name && (a2.disconnect(), t4.startTime < r2.firstHiddenTime && (i2.value = Math.max(t4.startTime - s(), 0), i2.entries.push(t4), n2(true)));
+            }));
+          }));
+          a2 && (n2 = l(t2, i2, L, e2.reportAllChanges), u((function(r3) {
+            i2 = f("FCP"), n2 = l(t2, i2, L, e2.reportAllChanges), m((function() {
+              i2.value = performance.now() - r3.timeStamp, n2(true);
+            }));
+          })));
+        }));
+      };
+      M = [0.1, 0.25];
+      D = function(t2, e2) {
+        !(function(t3, e3) {
+          e3 = e3 || {}, C(v((function() {
+            var n2, r2 = f("CLS", 0), i2 = 0, a2 = [], o2 = function(t4) {
+              t4.forEach((function(t5) {
+                if (!t5.hadRecentInput) {
+                  var e4 = a2[0], n3 = a2[a2.length - 1];
+                  i2 && t5.startTime - n3.startTime < 1e3 && t5.startTime - e4.startTime < 5e3 ? (i2 += t5.value, a2.push(t5)) : (i2 = t5.value, a2 = [t5]);
+                }
+              })), i2 > r2.value && (r2.value = i2, r2.entries = a2, n2());
+            }, c2 = d("layout-shift", o2);
+            c2 && (n2 = l(t3, r2, M, e3.reportAllChanges), p((function() {
+              o2(c2.takeRecords()), n2(true);
+            })), u((function() {
+              i2 = 0, r2 = f("CLS", 0), n2 = l(t3, r2, M, e3.reportAllChanges), m((function() {
+                return n2();
+              }));
+            })), setTimeout(n2, 0));
+          })));
+        })((function(e3) {
+          var n2 = (function(t3) {
+            var e4, n3 = {};
+            if (t3.entries.length) {
+              var i2 = t3.entries.reduce((function(t4, e5) {
+                return t4 && t4.value > e5.value ? t4 : e5;
+              }));
+              if (i2 && i2.sources && i2.sources.length) {
+                var o2 = (e4 = i2.sources).find((function(t4) {
+                  return t4.node && 1 === t4.node.nodeType;
+                })) || e4[0];
+                o2 && (n3 = { largestShiftTarget: a(o2.node), largestShiftTime: i2.startTime, largestShiftValue: i2.value, largestShiftSource: o2, largestShiftEntry: i2, loadState: r(i2.startTime) });
+              }
+            }
+            return Object.assign(t3, { attribution: n3 });
+          })(e3);
+          t2(n2);
+        }), e2);
+      };
+      x = 0;
+      I = 1 / 0;
+      k = 0;
+      A = function(t2) {
+        t2.forEach((function(t3) {
+          t3.interactionId && (I = Math.min(I, t3.interactionId), k = Math.max(k, t3.interactionId), x = k ? (k - I) / 7 + 1 : 0);
+        }));
+      };
+      F = function() {
+        return t ? x : performance.interactionCount || 0;
+      };
+      P = function() {
+        "interactionCount" in performance || t || (t = d("event", A, { type: "event", buffered: true, durationThreshold: 0 }));
+      };
+      B = [];
+      O = /* @__PURE__ */ new Map();
+      R = 0;
+      j = function() {
+        var t2 = Math.min(B.length - 1, Math.floor((F() - R) / 50));
+        return B[t2];
+      };
+      q = [];
+      H = function(t2) {
+        if (q.forEach((function(e3) {
+          return e3(t2);
+        })), t2.interactionId || "first-input" === t2.entryType) {
+          var e2 = B[B.length - 1], n2 = O.get(t2.interactionId);
+          if (n2 || B.length < 10 || t2.duration > e2.latency) {
+            if (n2) t2.duration > n2.latency ? (n2.entries = [t2], n2.latency = t2.duration) : t2.duration === n2.latency && t2.startTime === n2.entries[0].startTime && n2.entries.push(t2);
+            else {
+              var r2 = { id: t2.interactionId, latency: t2.duration, entries: [t2] };
+              O.set(r2.id, r2), B.push(r2);
+            }
+            B.sort((function(t3, e3) {
+              return e3.latency - t3.latency;
+            })), B.length > 10 && B.splice(10).forEach((function(t3) {
+              return O.delete(t3.id);
+            }));
+          }
+        }
+      };
+      N = function(t2) {
+        var e2 = self.requestIdleCallback || self.setTimeout, n2 = -1;
+        return t2 = v(t2), "hidden" === document.visibilityState ? t2() : (n2 = e2(t2), p(t2)), n2;
+      };
+      W = [200, 500];
+      z = function(t2, e2) {
+        "PerformanceEventTiming" in self && "interactionId" in PerformanceEventTiming.prototype && (e2 = e2 || {}, b((function() {
+          var n2;
+          P();
+          var r2, i2 = f("INP"), a2 = function(t3) {
+            N((function() {
+              t3.forEach(H);
+              var e3 = j();
+              e3 && e3.latency !== i2.value && (i2.value = e3.latency, i2.entries = e3.entries, r2());
+            }));
+          }, o2 = d("event", a2, { durationThreshold: null !== (n2 = e2.durationThreshold) && void 0 !== n2 ? n2 : 40 });
+          r2 = l(t2, i2, W, e2.reportAllChanges), o2 && (o2.observe({ type: "first-input", buffered: true }), p((function() {
+            a2(o2.takeRecords()), r2(true);
+          })), u((function() {
+            R = F(), B.length = 0, O.clear(), i2 = f("INP"), r2 = l(t2, i2, W, e2.reportAllChanges);
+          })));
+        })));
+      };
+      U = [];
+      V = [];
+      _ = 0;
+      G = /* @__PURE__ */ new WeakMap();
+      J = /* @__PURE__ */ new Map();
+      K = -1;
+      Q = function(t2) {
+        U = U.concat(t2), X();
+      };
+      X = function() {
+        K < 0 && (K = N(Y));
+      };
+      Y = function() {
+        J.size > 10 && J.forEach((function(t3, e3) {
+          O.has(e3) || J.delete(e3);
+        }));
+        var t2 = B.map((function(t3) {
+          return G.get(t3.entries[0]);
+        })), e2 = V.length - 50;
+        V = V.filter((function(n3, r3) {
+          return r3 >= e2 || t2.includes(n3);
+        }));
+        for (var n2 = /* @__PURE__ */ new Set(), r2 = 0; r2 < V.length; r2++) {
+          var i2 = V[r2];
+          nt(i2.startTime, i2.processingEnd).forEach((function(t3) {
+            n2.add(t3);
+          }));
+        }
+        var a2 = U.length - 1 - 50;
+        U = U.filter((function(t3, e3) {
+          return t3.startTime > _ && e3 > a2 || n2.has(t3);
+        })), K = -1;
+      };
+      q.push((function(t2) {
+        t2.interactionId && t2.target && !J.has(t2.interactionId) && J.set(t2.interactionId, t2.target);
+      }), (function(t2) {
+        var e2, n2 = t2.startTime + t2.duration;
+        _ = Math.max(_, t2.processingEnd);
+        for (var r2 = V.length - 1; r2 >= 0; r2--) {
+          var i2 = V[r2];
+          if (Math.abs(n2 - i2.renderTime) <= 8) {
+            (e2 = i2).startTime = Math.min(t2.startTime, e2.startTime), e2.processingStart = Math.min(t2.processingStart, e2.processingStart), e2.processingEnd = Math.max(t2.processingEnd, e2.processingEnd), e2.entries.push(t2);
+            break;
+          }
+        }
+        e2 || (e2 = { startTime: t2.startTime, processingStart: t2.processingStart, processingEnd: t2.processingEnd, renderTime: n2, entries: [t2] }, V.push(e2)), (t2.interactionId || "first-input" === t2.entryType) && G.set(t2, e2), X();
+      }));
+      nt = function(t2, e2) {
+        for (var n2, r2 = [], i2 = 0; n2 = U[i2]; i2++) if (!(n2.startTime + n2.duration < t2)) {
+          if (n2.startTime > e2) break;
+          r2.push(n2);
+        }
+        return r2;
+      };
+      rt = function(t2, n2) {
+        e || (e = d("long-animation-frame", Q)), z((function(e2) {
+          var n3 = (function(t3) {
+            var e3 = t3.entries[0], n4 = G.get(e3), i2 = e3.processingStart, o2 = n4.processingEnd, c2 = n4.entries.sort((function(t4, e4) {
+              return t4.processingStart - e4.processingStart;
+            })), u2 = nt(e3.startTime, o2), s2 = t3.entries.find((function(t4) {
+              return t4.target;
+            })), f2 = s2 && s2.target || J.get(e3.interactionId), d2 = [e3.startTime + e3.duration, o2].concat(u2.map((function(t4) {
+              return t4.startTime + t4.duration;
+            }))), l2 = Math.max.apply(Math, d2), m2 = { interactionTarget: a(f2), interactionTargetElement: f2, interactionType: e3.name.startsWith("key") ? "keyboard" : "pointer", interactionTime: e3.startTime, nextPaintTime: l2, processedEventEntries: c2, longAnimationFrameEntries: u2, inputDelay: i2 - e3.startTime, processingDuration: o2 - i2, presentationDelay: Math.max(l2 - o2, 0), loadState: r(e3.startTime) };
+            return Object.assign(t3, { attribution: m2 });
+          })(e2);
+          t2(n3);
+        }), n2);
+      };
+      it = [2500, 4e3];
+      at = {};
+      ot = function(t2, e2) {
+        !(function(t3, e3) {
+          e3 = e3 || {}, b((function() {
+            var n2, r2 = S(), i2 = f("LCP"), a2 = function(t4) {
+              e3.reportAllChanges || (t4 = t4.slice(-1)), t4.forEach((function(t5) {
+                t5.startTime < r2.firstHiddenTime && (i2.value = Math.max(t5.startTime - s(), 0), i2.entries = [t5], n2());
+              }));
+            }, o2 = d("largest-contentful-paint", a2);
+            if (o2) {
+              n2 = l(t3, i2, it, e3.reportAllChanges);
+              var c2 = v((function() {
+                at[i2.id] || (a2(o2.takeRecords()), o2.disconnect(), at[i2.id] = true, n2(true));
+              }));
+              ["keydown", "click"].forEach((function(t4) {
+                addEventListener(t4, (function() {
+                  return N(c2);
+                }), { once: true, capture: true });
+              })), p(c2), u((function(r3) {
+                i2 = f("LCP"), n2 = l(t3, i2, it, e3.reportAllChanges), m((function() {
+                  i2.value = performance.now() - r3.timeStamp, at[i2.id] = true, n2(true);
+                }));
+              }));
+            }
+          }));
+        })((function(e3) {
+          var r2 = (function(t3) {
+            var e4 = { timeToFirstByte: 0, resourceLoadDelay: 0, resourceLoadDuration: 0, elementRenderDelay: t3.value };
+            if (t3.entries.length) {
+              var r3 = n();
+              if (r3) {
+                var i2 = r3.activationStart || 0, o2 = t3.entries[t3.entries.length - 1], c2 = o2.url && performance.getEntriesByType("resource").filter((function(t4) {
+                  return t4.name === o2.url;
+                }))[0], u2 = Math.max(0, r3.responseStart - i2), s2 = Math.max(u2, c2 ? (c2.requestStart || c2.startTime) - i2 : 0), f2 = Math.max(s2, c2 ? c2.responseEnd - i2 : 0), d2 = Math.max(f2, o2.startTime - i2);
+                e4 = { element: a(o2.element), timeToFirstByte: u2, resourceLoadDelay: s2 - u2, resourceLoadDuration: f2 - s2, elementRenderDelay: d2 - f2, navigationEntry: r3, lcpEntry: o2 }, o2.url && (e4.url = o2.url), c2 && (e4.lcpResourceEntry = c2);
+              }
+            }
+            return Object.assign(t3, { attribution: e4 });
+          })(e3);
+          t2(r2);
+        }), e2);
+      };
+    }
+  });
+
+  // node_modules/@firebase/performance/dist/esm/index.esm.js
+  function setupApi(window2) {
+    windowInstance = window2;
+  }
+  function getIidPromise(installationsService) {
+    const iidPromise = installationsService.getId();
+    iidPromise.then((iidVal) => {
+      iid = iidVal;
+    });
+    return iidPromise;
+  }
+  function getIid() {
+    return iid;
+  }
+  function getAuthTokenPromise(installationsService) {
+    const authTokenPromise = installationsService.getToken();
+    authTokenPromise.then((authTokenVal) => {
+    });
+    return authTokenPromise;
+  }
+  function mergeStrings(part1, part2) {
+    const sizeDiff = part1.length - part2.length;
+    if (sizeDiff < 0 || sizeDiff > 1) {
+      throw ERROR_FACTORY4.create(
+        "invalid String merger input"
+        /* ErrorCode.INVALID_STRING_MERGER_PARAMETER */
+      );
+    }
+    const resultArray = [];
+    for (let i2 = 0; i2 < part1.length; i2++) {
+      resultArray.push(part1.charAt(i2));
+      if (part2.length > i2) {
+        resultArray.push(part2.charAt(i2));
+      }
+    }
+    return resultArray.join("");
+  }
+  function getServiceWorkerStatus() {
+    const navigator2 = Api.getInstance().navigator;
+    if (navigator2?.serviceWorker) {
+      if (navigator2.serviceWorker.controller) {
+        return 2;
+      } else {
+        return 3;
+      }
+    } else {
+      return 1;
+    }
+  }
+  function getVisibilityState() {
+    const document2 = Api.getInstance().document;
+    const visibilityState = document2.visibilityState;
+    switch (visibilityState) {
+      case "visible":
+        return VisibilityState.VISIBLE;
+      case "hidden":
+        return VisibilityState.HIDDEN;
+      default:
+        return VisibilityState.UNKNOWN;
+    }
+  }
+  function getEffectiveConnectionType() {
+    const navigator2 = Api.getInstance().navigator;
+    const navigatorConnection = navigator2.connection;
+    const effectiveType = navigatorConnection && navigatorConnection.effectiveType;
+    switch (effectiveType) {
+      case "slow-2g":
+        return 1;
+      case "2g":
+        return 2;
+      case "3g":
+        return 3;
+      case "4g":
+        return 4;
+      default:
+        return 0;
+    }
+  }
+  function isValidCustomAttributeName(name5) {
+    if (name5.length === 0 || name5.length > MAX_ATTRIBUTE_NAME_LENGTH) {
+      return false;
+    }
+    const matchesReservedPrefix = RESERVED_ATTRIBUTE_PREFIXES.some((prefix) => name5.startsWith(prefix));
+    return !matchesReservedPrefix && !!name5.match(ATTRIBUTE_FORMAT_REGEX);
+  }
+  function isValidCustomAttributeValue(value) {
+    return value.length !== 0 && value.length <= MAX_ATTRIBUTE_VALUE_LENGTH;
+  }
+  function getAppId(firebaseApp) {
+    const appId = firebaseApp.options?.appId;
+    if (!appId) {
+      throw ERROR_FACTORY4.create(
+        "no app id"
+        /* ErrorCode.NO_APP_ID */
+      );
+    }
+    return appId;
+  }
+  function getProjectId(firebaseApp) {
+    const projectId = firebaseApp.options?.projectId;
+    if (!projectId) {
+      throw ERROR_FACTORY4.create(
+        "no project id"
+        /* ErrorCode.NO_PROJECT_ID */
+      );
+    }
+    return projectId;
+  }
+  function getApiKey(firebaseApp) {
+    const apiKey = firebaseApp.options?.apiKey;
+    if (!apiKey) {
+      throw ERROR_FACTORY4.create(
+        "no api key"
+        /* ErrorCode.NO_API_KEY */
+      );
+    }
+    return apiKey;
+  }
+  function getConfig(performanceController, iid2) {
+    const config = getStoredConfig();
+    if (config) {
+      processConfig(config);
+      return Promise.resolve();
+    }
+    return getRemoteConfig(performanceController, iid2).then(processConfig).then(
+      (config2) => storeConfig(config2),
+      /** Do nothing for error, use defaults set in settings service. */
+      () => {
+      }
+    );
+  }
+  function getStoredConfig() {
+    const localStorage = Api.getInstance().localStorage;
+    if (!localStorage) {
+      return;
+    }
+    const expiryString = localStorage.getItem(CONFIG_EXPIRY_LOCAL_STORAGE_KEY);
+    if (!expiryString || !configValid(expiryString)) {
+      return;
+    }
+    const configStringified = localStorage.getItem(CONFIG_LOCAL_STORAGE_KEY);
+    if (!configStringified) {
+      return;
+    }
+    try {
+      const configResponse = JSON.parse(configStringified);
+      return configResponse;
+    } catch {
+      return;
+    }
+  }
+  function storeConfig(config) {
+    const localStorage = Api.getInstance().localStorage;
+    if (!config || !localStorage) {
+      return;
+    }
+    localStorage.setItem(CONFIG_LOCAL_STORAGE_KEY, JSON.stringify(config));
+    localStorage.setItem(CONFIG_EXPIRY_LOCAL_STORAGE_KEY, String(Date.now() + SettingsService.getInstance().configTimeToLive * 60 * 60 * 1e3));
+  }
+  function getRemoteConfig(performanceController, iid2) {
+    return getAuthTokenPromise(performanceController.installations).then((authToken) => {
+      const projectId = getProjectId(performanceController.app);
+      const apiKey = getApiKey(performanceController.app);
+      const configEndPoint = `https://firebaseremoteconfig.googleapis.com/v1/projects/${projectId}/namespaces/fireperf:fetch?key=${apiKey}`;
+      const request = new Request(configEndPoint, {
+        method: "POST",
+        headers: { Authorization: `${FIS_AUTH_PREFIX} ${authToken}` },
+        /* eslint-disable camelcase */
+        body: JSON.stringify({
+          app_instance_id: iid2,
+          app_instance_id_token: authToken,
+          app_id: getAppId(performanceController.app),
+          app_version: SDK_VERSION,
+          sdk_version: REMOTE_CONFIG_SDK_VERSION
+        })
+        /* eslint-enable camelcase */
+      });
+      return fetch(request).then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw ERROR_FACTORY4.create(
+          "RC response not ok"
+          /* ErrorCode.RC_NOT_OK */
+        );
+      });
+    }).catch(() => {
+      consoleLogger.info(COULD_NOT_GET_CONFIG_MSG);
+      return void 0;
+    });
+  }
+  function processConfig(config) {
+    if (!config) {
+      return config;
+    }
+    const settingsServiceInstance2 = SettingsService.getInstance();
+    const entries = config.entries || {};
+    if (entries.fpr_enabled !== void 0) {
+      settingsServiceInstance2.loggingEnabled = String(entries.fpr_enabled) === "true";
+    } else {
+      settingsServiceInstance2.loggingEnabled = DEFAULT_CONFIGS.loggingEnabled;
+    }
+    if (entries.fpr_log_source) {
+      settingsServiceInstance2.logSource = Number(entries.fpr_log_source);
+    } else if (DEFAULT_CONFIGS.logSource) {
+      settingsServiceInstance2.logSource = DEFAULT_CONFIGS.logSource;
+    }
+    if (entries.fpr_log_endpoint_url) {
+      settingsServiceInstance2.logEndPointUrl = entries.fpr_log_endpoint_url;
+    } else if (DEFAULT_CONFIGS.logEndPointUrl) {
+      settingsServiceInstance2.logEndPointUrl = DEFAULT_CONFIGS.logEndPointUrl;
+    }
+    if (entries.fpr_log_transport_key) {
+      settingsServiceInstance2.transportKey = entries.fpr_log_transport_key;
+    } else if (DEFAULT_CONFIGS.transportKey) {
+      settingsServiceInstance2.transportKey = DEFAULT_CONFIGS.transportKey;
+    }
+    if (entries.fpr_vc_network_request_sampling_rate !== void 0) {
+      settingsServiceInstance2.networkRequestsSamplingRate = Number(entries.fpr_vc_network_request_sampling_rate);
+    } else if (DEFAULT_CONFIGS.networkRequestsSamplingRate !== void 0) {
+      settingsServiceInstance2.networkRequestsSamplingRate = DEFAULT_CONFIGS.networkRequestsSamplingRate;
+    }
+    if (entries.fpr_vc_trace_sampling_rate !== void 0) {
+      settingsServiceInstance2.tracesSamplingRate = Number(entries.fpr_vc_trace_sampling_rate);
+    } else if (DEFAULT_CONFIGS.tracesSamplingRate !== void 0) {
+      settingsServiceInstance2.tracesSamplingRate = DEFAULT_CONFIGS.tracesSamplingRate;
+    }
+    if (entries.fpr_log_max_flush_size) {
+      settingsServiceInstance2.logMaxFlushSize = Number(entries.fpr_log_max_flush_size);
+    } else if (DEFAULT_CONFIGS.logMaxFlushSize) {
+      settingsServiceInstance2.logMaxFlushSize = DEFAULT_CONFIGS.logMaxFlushSize;
+    }
+    settingsServiceInstance2.logTraceAfterSampling = shouldLogAfterSampling(settingsServiceInstance2.tracesSamplingRate);
+    settingsServiceInstance2.logNetworkAfterSampling = shouldLogAfterSampling(settingsServiceInstance2.networkRequestsSamplingRate);
+    return config;
+  }
+  function configValid(expiry) {
+    return Number(expiry) > Date.now();
+  }
+  function shouldLogAfterSampling(samplingRate) {
+    return Math.random() <= samplingRate;
+  }
+  function getInitializationPromise(performanceController) {
+    initializationStatus = 2;
+    initializationPromise = initializationPromise || initializePerf(performanceController);
+    return initializationPromise;
+  }
+  function isPerfInitialized() {
+    return initializationStatus === 3;
+  }
+  function initializePerf(performanceController) {
+    return getDocumentReadyComplete().then(() => getIidPromise(performanceController.installations)).then((iid2) => getConfig(performanceController, iid2)).then(() => changeInitializationStatus(), () => changeInitializationStatus());
+  }
+  function getDocumentReadyComplete() {
+    const document2 = Api.getInstance().document;
+    return new Promise((resolve) => {
+      if (document2 && document2.readyState !== "complete") {
+        const handler = () => {
+          if (document2.readyState === "complete") {
+            document2.removeEventListener("readystatechange", handler);
+            resolve();
+          }
+        };
+        document2.addEventListener("readystatechange", handler);
+      } else {
+        resolve();
+      }
+    });
+  }
+  function changeInitializationStatus() {
+    initializationStatus = 3;
+  }
+  function setupTransportService() {
+    if (!isTransportSetup) {
+      processQueue(INITIAL_SEND_TIME_DELAY_MS);
+      isTransportSetup = true;
+    }
+  }
+  function processQueue(timeOffset) {
+    setTimeout(() => {
+      if (remainingTries <= 0) {
+        return;
+      }
+      if (queue.length > 0) {
+        dispatchQueueEvents();
+      }
+      processQueue(DEFAULT_SEND_INTERVAL_MS);
+    }, timeOffset);
+  }
+  function dispatchQueueEvents() {
+    const staged = queue.splice(0, MAX_EVENT_COUNT_PER_REQUEST);
+    const data = buildPayload(staged);
+    postToFlEndpoint(data).then(() => {
+      remainingTries = DEFAULT_REMAINING_TRIES;
+    }).catch(() => {
+      queue = [...staged, ...queue];
+      remainingTries--;
+      consoleLogger.info(`Tries left: ${remainingTries}.`);
+      processQueue(DEFAULT_SEND_INTERVAL_MS);
+    });
+  }
+  function buildPayload(events) {
+    const log_event = events.map((evt) => ({
+      source_extension_json_proto3: evt.message,
+      event_time_ms: String(evt.eventTime)
+    }));
+    const transportBatchLog = {
+      request_time_ms: String(Date.now()),
+      client_info: {
+        client_type: 1,
+        // 1 is JS
+        js_client_info: {}
+      },
+      log_source: SettingsService.getInstance().logSource,
+      log_event
+    };
+    return JSON.stringify(transportBatchLog);
+  }
+  function postToFlEndpoint(body) {
+    const flTransportFullUrl = SettingsService.getInstance().getFlTransportFullUrl();
+    const size = TEXT_ENCODER.encode(body).length;
+    if (size <= MAX_SEND_BEACON_PAYLOAD_SIZE && navigator.sendBeacon && navigator.sendBeacon(flTransportFullUrl, body)) {
+      return Promise.resolve();
+    } else {
+      return fetch(flTransportFullUrl, {
+        method: "POST",
+        body
+      });
+    }
+  }
+  function addToQueue(evt) {
+    if (!evt.eventTime || !evt.message) {
+      throw ERROR_FACTORY4.create(
+        "invalid cc log"
+        /* ErrorCode.INVALID_CC_LOG */
+      );
+    }
+    queue = [...queue, evt];
+  }
+  function transportHandler(serializer2) {
+    return (...args) => {
+      const message = serializer2(...args);
+      addToQueue({
+        message,
+        eventTime: Date.now()
+      });
+    };
+  }
+  function flushQueuedEvents() {
+    const flTransportFullUrl = SettingsService.getInstance().getFlTransportFullUrl();
+    while (queue.length > 0) {
+      const staged = queue.splice(-SettingsService.getInstance().logMaxFlushSize);
+      const body = buildPayload(staged);
+      if (navigator.sendBeacon && navigator.sendBeacon(flTransportFullUrl, body)) {
+        continue;
+      } else {
+        queue = [...queue, ...staged];
+        break;
+      }
+    }
+    if (queue.length > 0) {
+      const body = buildPayload(queue);
+      fetch(flTransportFullUrl, {
+        method: "POST",
+        body
+      }).catch(() => {
+        consoleLogger.info(`Failed flushing queued events.`);
+      });
+    }
+  }
+  function sendLog(resource, resourceType) {
+    if (!logger3) {
+      logger3 = {
+        send: transportHandler(serializer),
+        flush: flushQueuedEvents
+      };
+    }
+    logger3.send(resource, resourceType);
+  }
+  function logTrace(trace2) {
+    const settingsService = SettingsService.getInstance();
+    if (!settingsService.instrumentationEnabled && trace2.isAuto) {
+      return;
+    }
+    if (!settingsService.dataCollectionEnabled && !trace2.isAuto) {
+      return;
+    }
+    if (!Api.getInstance().requiredApisAvailable()) {
+      return;
+    }
+    if (isPerfInitialized()) {
+      sendTraceLog(trace2);
+    } else {
+      getInitializationPromise(trace2.performanceController).then(() => sendTraceLog(trace2), () => sendTraceLog(trace2));
+    }
+  }
+  function flushLogs() {
+    if (logger3) {
+      logger3.flush();
+    }
+  }
+  function sendTraceLog(trace2) {
+    if (!getIid()) {
+      return;
+    }
+    const settingsService = SettingsService.getInstance();
+    if (!settingsService.loggingEnabled || !settingsService.logTraceAfterSampling) {
+      return;
+    }
+    sendLog(
+      trace2,
+      1
+      /* ResourceType.Trace */
+    );
+  }
+  function logNetworkRequest(networkRequest) {
+    const settingsService = SettingsService.getInstance();
+    if (!settingsService.instrumentationEnabled) {
+      return;
+    }
+    const networkRequestUrl = networkRequest.url;
+    const logEndpointUrl = settingsService.logEndPointUrl.split("?")[0];
+    const flEndpointUrl = settingsService.flTransportEndpointUrl.split("?")[0];
+    if (networkRequestUrl === logEndpointUrl || networkRequestUrl === flEndpointUrl) {
+      return;
+    }
+    if (!settingsService.loggingEnabled || !settingsService.logNetworkAfterSampling) {
+      return;
+    }
+    sendLog(
+      networkRequest,
+      0
+      /* ResourceType.NetworkRequest */
+    );
+  }
+  function serializer(resource, resourceType) {
+    if (resourceType === 0) {
+      return serializeNetworkRequest(resource);
+    }
+    return serializeTrace(resource);
+  }
+  function serializeNetworkRequest(networkRequest) {
+    const networkRequestMetric = {
+      url: networkRequest.url,
+      http_method: networkRequest.httpMethod || 0,
+      http_response_code: 200,
+      response_payload_bytes: networkRequest.responsePayloadBytes,
+      client_start_time_us: networkRequest.startTimeUs,
+      time_to_response_initiated_us: networkRequest.timeToResponseInitiatedUs,
+      time_to_response_completed_us: networkRequest.timeToResponseCompletedUs
+    };
+    const perfMetric = {
+      application_info: getApplicationInfo(networkRequest.performanceController.app),
+      network_request_metric: networkRequestMetric
+    };
+    return JSON.stringify(perfMetric);
+  }
+  function serializeTrace(trace2) {
+    const traceMetric = {
+      name: trace2.name,
+      is_auto: trace2.isAuto,
+      client_start_time_us: trace2.startTimeUs,
+      duration_us: trace2.durationUs
+    };
+    if (Object.keys(trace2.counters).length !== 0) {
+      traceMetric.counters = trace2.counters;
+    }
+    const customAttributes = trace2.getAttributes();
+    if (Object.keys(customAttributes).length !== 0) {
+      traceMetric.custom_attributes = customAttributes;
+    }
+    const perfMetric = {
+      application_info: getApplicationInfo(trace2.performanceController.app),
+      trace_metric: traceMetric
+    };
+    return JSON.stringify(perfMetric);
+  }
+  function getApplicationInfo(firebaseApp) {
+    return {
+      google_app_id: getAppId(firebaseApp),
+      app_instance_id: getIid(),
+      web_app_info: {
+        sdk_version: SDK_VERSION,
+        page_url: Api.getInstance().getUrl(),
+        service_worker_status: getServiceWorkerStatus(),
+        visibility_state: getVisibilityState(),
+        effective_connection_type: getEffectiveConnectionType()
+      },
+      application_process_state: 0
+    };
+  }
+  function createNetworkRequestEntry(performanceController, entry) {
+    const performanceEntry = entry;
+    if (!performanceEntry || performanceEntry.responseStart === void 0) {
+      return;
+    }
+    const timeOrigin = Api.getInstance().getTimeOrigin();
+    const startTimeUs = Math.floor((performanceEntry.startTime + timeOrigin) * 1e3);
+    const timeToResponseInitiatedUs = performanceEntry.responseStart ? Math.floor((performanceEntry.responseStart - performanceEntry.startTime) * 1e3) : void 0;
+    const timeToResponseCompletedUs = Math.floor((performanceEntry.responseEnd - performanceEntry.startTime) * 1e3);
+    const url = performanceEntry.name && performanceEntry.name.split("?")[0];
+    const networkRequest = {
+      performanceController,
+      url,
+      responsePayloadBytes: performanceEntry.transferSize,
+      startTimeUs,
+      timeToResponseInitiatedUs,
+      timeToResponseCompletedUs
+    };
+    logNetworkRequest(networkRequest);
+  }
+  function isValidMetricName(name5, traceName) {
+    if (name5.length === 0 || name5.length > MAX_METRIC_NAME_LENGTH) {
+      return false;
+    }
+    return traceName && traceName.startsWith(OOB_TRACE_PAGE_LOAD_PREFIX) && oobMetrics.indexOf(name5) > -1 || !name5.startsWith(RESERVED_AUTO_PREFIX);
+  }
+  function convertMetricValueToInteger(providedValue) {
+    const valueAsInteger = Math.floor(providedValue);
+    if (valueAsInteger < providedValue) {
+      consoleLogger.info(`Metric value should be an Integer, setting the value as : ${valueAsInteger}.`);
+    }
+    return valueAsInteger;
+  }
+  function setupOobResources(performanceController) {
+    if (!getIid()) {
+      return;
+    }
+    setTimeout(() => setupOobTraces(performanceController), 0);
+    setTimeout(() => setupNetworkRequests(performanceController), 0);
+    setTimeout(() => setupUserTimingTraces(performanceController), 0);
+  }
+  function setupNetworkRequests(performanceController) {
+    const api = Api.getInstance();
+    const resources = api.getEntriesByType("resource");
+    for (const resource of resources) {
+      createNetworkRequestEntry(performanceController, resource);
+    }
+    api.setupObserver("resource", (entry) => createNetworkRequestEntry(performanceController, entry));
+  }
+  function setupOobTraces(performanceController) {
+    const api = Api.getInstance();
+    if ("onpagehide" in window) {
+      api.document.addEventListener("pagehide", () => sendOobTrace(performanceController));
+    } else {
+      api.document.addEventListener("unload", () => sendOobTrace(performanceController));
+    }
+    api.document.addEventListener("visibilitychange", () => {
+      if (api.document.visibilityState === "hidden") {
+        sendOobTrace(performanceController);
+      }
+    });
+    if (api.onFirstInputDelay) {
+      api.onFirstInputDelay((fid) => {
+        firstInputDelay = fid;
+      });
+    }
+    api.onLCP((metric) => {
+      webVitalMetrics.lcp = {
+        value: metric.value,
+        elementAttribution: metric.attribution?.element
+      };
+    });
+    api.onCLS((metric) => {
+      webVitalMetrics.cls = {
+        value: metric.value,
+        elementAttribution: metric.attribution?.largestShiftTarget
+      };
+    });
+    api.onINP((metric) => {
+      webVitalMetrics.inp = {
+        value: metric.value,
+        elementAttribution: metric.attribution?.interactionTarget
+      };
+    });
+  }
+  function setupUserTimingTraces(performanceController) {
+    const api = Api.getInstance();
+    const measures = api.getEntriesByType("measure");
+    for (const measure of measures) {
+      createUserTimingTrace(performanceController, measure);
+    }
+    api.setupObserver("measure", (entry) => createUserTimingTrace(performanceController, entry));
+  }
+  function createUserTimingTrace(performanceController, measure) {
+    const measureName = measure.name;
+    if (measureName.substring(0, TRACE_MEASURE_PREFIX.length) === TRACE_MEASURE_PREFIX) {
+      return;
+    }
+    Trace.createUserTimingTrace(performanceController, measureName);
+  }
+  function sendOobTrace(performanceController) {
+    if (!sentPageLoadTrace) {
+      sentPageLoadTrace = true;
+      const api = Api.getInstance();
+      const navigationTimings = api.getEntriesByType("navigation");
+      const paintTimings = api.getEntriesByType("paint");
+      setTimeout(() => {
+        Trace.createOobTrace(performanceController, navigationTimings, paintTimings, webVitalMetrics, firstInputDelay);
+      }, 0);
+    }
+  }
+  function getPerformance(app = getApp()) {
+    app = getModularInstance(app);
+    const provider = _getProvider(app, "performance");
+    const perfInstance = provider.getImmediate();
+    return perfInstance;
+  }
+  function trace(performance2, name5) {
+    performance2 = getModularInstance(performance2);
+    return new Trace(performance2, name5);
+  }
+  function registerPerformance() {
+    _registerComponent(new Component(
+      "performance",
+      factory2,
+      "PUBLIC"
+      /* ComponentType.PUBLIC */
+    ));
+    registerVersion(name4, version3);
+    registerVersion(name4, version3, "esm2020");
+  }
+  var name4, version3, SDK_VERSION, TRACE_START_MARK_PREFIX, TRACE_STOP_MARK_PREFIX, TRACE_MEASURE_PREFIX, OOB_TRACE_PAGE_LOAD_PREFIX, FIRST_PAINT_COUNTER_NAME, FIRST_CONTENTFUL_PAINT_COUNTER_NAME, FIRST_INPUT_DELAY_COUNTER_NAME, LARGEST_CONTENTFUL_PAINT_METRIC_NAME, LARGEST_CONTENTFUL_PAINT_ATTRIBUTE_NAME, INTERACTION_TO_NEXT_PAINT_METRIC_NAME, INTERACTION_TO_NEXT_PAINT_ATTRIBUTE_NAME, CUMULATIVE_LAYOUT_SHIFT_METRIC_NAME, CUMULATIVE_LAYOUT_SHIFT_ATTRIBUTE_NAME, CONFIG_LOCAL_STORAGE_KEY, CONFIG_EXPIRY_LOCAL_STORAGE_KEY, SERVICE2, SERVICE_NAME2, ERROR_DESCRIPTION_MAP2, ERROR_FACTORY4, consoleLogger, apiInstance, windowInstance, Api, iid, settingsServiceInstance, SettingsService, VisibilityState, RESERVED_ATTRIBUTE_PREFIXES, ATTRIBUTE_FORMAT_REGEX, MAX_ATTRIBUTE_NAME_LENGTH, MAX_ATTRIBUTE_VALUE_LENGTH, REMOTE_CONFIG_SDK_VERSION, DEFAULT_CONFIGS, FIS_AUTH_PREFIX, COULD_NOT_GET_CONFIG_MSG, initializationStatus, initializationPromise, DEFAULT_SEND_INTERVAL_MS, INITIAL_SEND_TIME_DELAY_MS, MAX_EVENT_COUNT_PER_REQUEST, DEFAULT_REMAINING_TRIES, MAX_SEND_BEACON_PAYLOAD_SIZE, TEXT_ENCODER, remainingTries, queue, isTransportSetup, logger3, MAX_METRIC_NAME_LENGTH, RESERVED_AUTO_PREFIX, oobMetrics, Trace, webVitalMetrics, sentPageLoadTrace, firstInputDelay, PerformanceController, DEFAULT_ENTRY_NAME3, factory2;
+  var init_index_esm8 = __esm({
+    "node_modules/@firebase/performance/dist/esm/index.esm.js"() {
+      init_index_esm();
+      init_index_esm3();
+      init_web_vitals_attribution();
+      init_index_esm4();
+      init_index_esm2();
+      init_index_esm5();
+      name4 = "@firebase/performance";
+      version3 = "0.7.14";
+      SDK_VERSION = version3;
+      TRACE_START_MARK_PREFIX = "FB-PERF-TRACE-START";
+      TRACE_STOP_MARK_PREFIX = "FB-PERF-TRACE-STOP";
+      TRACE_MEASURE_PREFIX = "FB-PERF-TRACE-MEASURE";
+      OOB_TRACE_PAGE_LOAD_PREFIX = "_wt_";
+      FIRST_PAINT_COUNTER_NAME = "_fp";
+      FIRST_CONTENTFUL_PAINT_COUNTER_NAME = "_fcp";
+      FIRST_INPUT_DELAY_COUNTER_NAME = "_fid";
+      LARGEST_CONTENTFUL_PAINT_METRIC_NAME = "_lcp";
+      LARGEST_CONTENTFUL_PAINT_ATTRIBUTE_NAME = "lcp_element";
+      INTERACTION_TO_NEXT_PAINT_METRIC_NAME = "_inp";
+      INTERACTION_TO_NEXT_PAINT_ATTRIBUTE_NAME = "inp_interactionTarget";
+      CUMULATIVE_LAYOUT_SHIFT_METRIC_NAME = "_cls";
+      CUMULATIVE_LAYOUT_SHIFT_ATTRIBUTE_NAME = "cls_largestShiftTarget";
+      CONFIG_LOCAL_STORAGE_KEY = "@firebase/performance/config";
+      CONFIG_EXPIRY_LOCAL_STORAGE_KEY = "@firebase/performance/configexpire";
+      SERVICE2 = "performance";
+      SERVICE_NAME2 = "Performance";
+      ERROR_DESCRIPTION_MAP2 = {
+        [
+          "trace started"
+          /* ErrorCode.TRACE_STARTED_BEFORE */
+        ]: "Trace {$traceName} was started before.",
+        [
+          "trace stopped"
+          /* ErrorCode.TRACE_STOPPED_BEFORE */
+        ]: "Trace {$traceName} is not running.",
+        [
+          "nonpositive trace startTime"
+          /* ErrorCode.NONPOSITIVE_TRACE_START_TIME */
+        ]: "Trace {$traceName} startTime should be positive.",
+        [
+          "nonpositive trace duration"
+          /* ErrorCode.NONPOSITIVE_TRACE_DURATION */
+        ]: "Trace {$traceName} duration should be positive.",
+        [
+          "no window"
+          /* ErrorCode.NO_WINDOW */
+        ]: "Window is not available.",
+        [
+          "no app id"
+          /* ErrorCode.NO_APP_ID */
+        ]: "App id is not available.",
+        [
+          "no project id"
+          /* ErrorCode.NO_PROJECT_ID */
+        ]: "Project id is not available.",
+        [
+          "no api key"
+          /* ErrorCode.NO_API_KEY */
+        ]: "Api key is not available.",
+        [
+          "invalid cc log"
+          /* ErrorCode.INVALID_CC_LOG */
+        ]: "Attempted to queue invalid cc event",
+        [
+          "FB not default"
+          /* ErrorCode.FB_NOT_DEFAULT */
+        ]: "Performance can only start when Firebase app instance is the default one.",
+        [
+          "RC response not ok"
+          /* ErrorCode.RC_NOT_OK */
+        ]: "RC response is not ok",
+        [
+          "invalid attribute name"
+          /* ErrorCode.INVALID_ATTRIBUTE_NAME */
+        ]: "Attribute name {$attributeName} is invalid.",
+        [
+          "invalid attribute value"
+          /* ErrorCode.INVALID_ATTRIBUTE_VALUE */
+        ]: "Attribute value {$attributeValue} is invalid.",
+        [
+          "invalid custom metric name"
+          /* ErrorCode.INVALID_CUSTOM_METRIC_NAME */
+        ]: "Custom metric name {$customMetricName} is invalid",
+        [
+          "invalid String merger input"
+          /* ErrorCode.INVALID_STRING_MERGER_PARAMETER */
+        ]: "Input for String merger is invalid, contact support team to resolve.",
+        [
+          "already initialized"
+          /* ErrorCode.ALREADY_INITIALIZED */
+        ]: "initializePerformance() has already been called with different options. To avoid this error, call initializePerformance() with the same options as when it was originally called, or call getPerformance() to return the already initialized instance."
+      };
+      ERROR_FACTORY4 = new ErrorFactory(SERVICE2, SERVICE_NAME2, ERROR_DESCRIPTION_MAP2);
+      consoleLogger = new Logger(SERVICE_NAME2);
+      consoleLogger.logLevel = LogLevel.INFO;
+      Api = class _Api {
+        constructor(window2) {
+          this.window = window2;
+          if (!window2) {
+            throw ERROR_FACTORY4.create(
+              "no window"
+              /* ErrorCode.NO_WINDOW */
+            );
+          }
+          this.performance = window2.performance;
+          this.PerformanceObserver = window2.PerformanceObserver;
+          this.windowLocation = window2.location;
+          this.navigator = window2.navigator;
+          this.document = window2.document;
+          if (this.navigator && this.navigator.cookieEnabled) {
+            this.localStorage = window2.localStorage;
+          }
+          if (window2.perfMetrics && window2.perfMetrics.onFirstInputDelay) {
+            this.onFirstInputDelay = window2.perfMetrics.onFirstInputDelay;
+          }
+          this.onLCP = ot;
+          this.onINP = rt;
+          this.onCLS = D;
+        }
+        getUrl() {
+          return this.windowLocation.href.split("?")[0];
+        }
+        mark(name5) {
+          if (!this.performance || !this.performance.mark) {
+            return;
+          }
+          this.performance.mark(name5);
+        }
+        measure(measureName, mark1, mark2) {
+          if (!this.performance || !this.performance.measure) {
+            return;
+          }
+          this.performance.measure(measureName, mark1, mark2);
+        }
+        getEntriesByType(type) {
+          if (!this.performance || !this.performance.getEntriesByType) {
+            return [];
+          }
+          return this.performance.getEntriesByType(type);
+        }
+        getEntriesByName(name5) {
+          if (!this.performance || !this.performance.getEntriesByName) {
+            return [];
+          }
+          return this.performance.getEntriesByName(name5);
+        }
+        getTimeOrigin() {
+          return this.performance && (this.performance.timeOrigin || this.performance.timing.navigationStart);
+        }
+        requiredApisAvailable() {
+          if (!fetch || !Promise || !areCookiesEnabled()) {
+            consoleLogger.info("Firebase Performance cannot start if browser does not support fetch and Promise or cookie is disabled.");
+            return false;
+          }
+          if (!isIndexedDBAvailable()) {
+            consoleLogger.info("IndexedDB is not supported by current browser");
+            return false;
+          }
+          return true;
+        }
+        setupObserver(entryType, callback) {
+          if (!this.PerformanceObserver) {
+            return;
+          }
+          const observer = new this.PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              callback(entry);
+            }
+          });
+          observer.observe({ entryTypes: [entryType] });
+        }
+        static getInstance() {
+          if (apiInstance === void 0) {
+            apiInstance = new _Api(windowInstance);
+          }
+          return apiInstance;
+        }
+      };
+      SettingsService = class _SettingsService {
+        constructor() {
+          this.instrumentationEnabled = true;
+          this.dataCollectionEnabled = true;
+          this.loggingEnabled = false;
+          this.tracesSamplingRate = 1;
+          this.networkRequestsSamplingRate = 1;
+          this.logEndPointUrl = "https://firebaselogging.googleapis.com/v0cc/log?format=json_proto";
+          this.flTransportEndpointUrl = mergeStrings("hts/frbslgigp.ogepscmv/ieo/eaylg", "tp:/ieaeogn-agolai.o/1frlglgc/o");
+          this.transportKey = mergeStrings("AzSC8r6ReiGqFMyfvgow", "Iayx0u-XT3vksVM-pIV");
+          this.logSource = 462;
+          this.logTraceAfterSampling = false;
+          this.logNetworkAfterSampling = false;
+          this.configTimeToLive = 12;
+          this.logMaxFlushSize = 40;
+        }
+        getFlTransportFullUrl() {
+          return this.flTransportEndpointUrl.concat("?key=", this.transportKey);
+        }
+        static getInstance() {
+          if (settingsServiceInstance === void 0) {
+            settingsServiceInstance = new _SettingsService();
+          }
+          return settingsServiceInstance;
+        }
+      };
+      (function(VisibilityState2) {
+        VisibilityState2[VisibilityState2["UNKNOWN"] = 0] = "UNKNOWN";
+        VisibilityState2[VisibilityState2["VISIBLE"] = 1] = "VISIBLE";
+        VisibilityState2[VisibilityState2["HIDDEN"] = 2] = "HIDDEN";
+      })(VisibilityState || (VisibilityState = {}));
+      RESERVED_ATTRIBUTE_PREFIXES = ["firebase_", "google_", "ga_"];
+      ATTRIBUTE_FORMAT_REGEX = new RegExp("^[a-zA-Z]\\w*$");
+      MAX_ATTRIBUTE_NAME_LENGTH = 40;
+      MAX_ATTRIBUTE_VALUE_LENGTH = 100;
+      REMOTE_CONFIG_SDK_VERSION = "0.0.1";
+      DEFAULT_CONFIGS = {
+        loggingEnabled: true
+      };
+      FIS_AUTH_PREFIX = "FIREBASE_INSTALLATIONS_AUTH";
+      COULD_NOT_GET_CONFIG_MSG = "Could not fetch config, will use default configs";
+      initializationStatus = 1;
+      DEFAULT_SEND_INTERVAL_MS = 10 * 1e3;
+      INITIAL_SEND_TIME_DELAY_MS = 5.5 * 1e3;
+      MAX_EVENT_COUNT_PER_REQUEST = 1e3;
+      DEFAULT_REMAINING_TRIES = 3;
+      MAX_SEND_BEACON_PAYLOAD_SIZE = 65536;
+      TEXT_ENCODER = new TextEncoder();
+      remainingTries = DEFAULT_REMAINING_TRIES;
+      queue = [];
+      isTransportSetup = false;
+      MAX_METRIC_NAME_LENGTH = 100;
+      RESERVED_AUTO_PREFIX = "_";
+      oobMetrics = [
+        FIRST_PAINT_COUNTER_NAME,
+        FIRST_CONTENTFUL_PAINT_COUNTER_NAME,
+        FIRST_INPUT_DELAY_COUNTER_NAME,
+        LARGEST_CONTENTFUL_PAINT_METRIC_NAME,
+        CUMULATIVE_LAYOUT_SHIFT_METRIC_NAME,
+        INTERACTION_TO_NEXT_PAINT_METRIC_NAME
+      ];
+      Trace = class _Trace {
+        /**
+         * @param performanceController The performance controller running.
+         * @param name The name of the trace.
+         * @param isAuto If the trace is auto-instrumented.
+         * @param traceMeasureName The name of the measure marker in user timing specification. This field
+         * is only set when the trace is built for logging when the user directly uses the user timing
+         * api (performance.mark and performance.measure).
+         */
+        constructor(performanceController, name5, isAuto = false, traceMeasureName) {
+          this.performanceController = performanceController;
+          this.name = name5;
+          this.isAuto = isAuto;
+          this.state = 1;
+          this.customAttributes = {};
+          this.counters = {};
+          this.api = Api.getInstance();
+          this.randomId = Math.floor(Math.random() * 1e6);
+          if (!this.isAuto) {
+            this.traceStartMark = `${TRACE_START_MARK_PREFIX}-${this.randomId}-${this.name}`;
+            this.traceStopMark = `${TRACE_STOP_MARK_PREFIX}-${this.randomId}-${this.name}`;
+            this.traceMeasure = traceMeasureName || `${TRACE_MEASURE_PREFIX}-${this.randomId}-${this.name}`;
+            if (traceMeasureName) {
+              this.calculateTraceMetrics();
+            }
+          }
+        }
+        /**
+         * Starts a trace. The measurement of the duration starts at this point.
+         */
+        start() {
+          if (this.state !== 1) {
+            throw ERROR_FACTORY4.create("trace started", {
+              traceName: this.name
+            });
+          }
+          this.api.mark(this.traceStartMark);
+          this.state = 2;
+        }
+        /**
+         * Stops the trace. The measurement of the duration of the trace stops at this point and trace
+         * is logged.
+         */
+        stop() {
+          if (this.state !== 2) {
+            throw ERROR_FACTORY4.create("trace stopped", {
+              traceName: this.name
+            });
+          }
+          this.state = 3;
+          this.api.mark(this.traceStopMark);
+          this.api.measure(this.traceMeasure, this.traceStartMark, this.traceStopMark);
+          this.calculateTraceMetrics();
+          logTrace(this);
+        }
+        /**
+         * Records a trace with predetermined values. If this method is used a trace is created and logged
+         * directly. No need to use start and stop methods.
+         * @param startTime Trace start time since epoch in millisec
+         * @param duration The duration of the trace in millisec
+         * @param options An object which can optionally hold maps of custom metrics and custom attributes
+         */
+        record(startTime, duration, options) {
+          if (startTime <= 0) {
+            throw ERROR_FACTORY4.create("nonpositive trace startTime", {
+              traceName: this.name
+            });
+          }
+          if (duration <= 0) {
+            throw ERROR_FACTORY4.create("nonpositive trace duration", {
+              traceName: this.name
+            });
+          }
+          this.durationUs = Math.floor(duration * 1e3);
+          this.startTimeUs = Math.floor(startTime * 1e3);
+          if (options && options.attributes) {
+            this.customAttributes = { ...options.attributes };
+          }
+          if (options && options.metrics) {
+            for (const metricName of Object.keys(options.metrics)) {
+              if (!isNaN(Number(options.metrics[metricName]))) {
+                this.counters[metricName] = Math.floor(Number(options.metrics[metricName]));
+              }
+            }
+          }
+          logTrace(this);
+        }
+        /**
+         * Increments a custom metric by a certain number or 1 if number not specified. Will create a new
+         * custom metric if one with the given name does not exist. The value will be floored down to an
+         * integer.
+         * @param counter Name of the custom metric
+         * @param numAsInteger Increment by value
+         */
+        incrementMetric(counter, numAsInteger = 1) {
+          if (this.counters[counter] === void 0) {
+            this.putMetric(counter, numAsInteger);
+          } else {
+            this.putMetric(counter, this.counters[counter] + numAsInteger);
+          }
+        }
+        /**
+         * Sets a custom metric to a specified value. Will create a new custom metric if one with the
+         * given name does not exist. The value will be floored down to an integer.
+         * @param counter Name of the custom metric
+         * @param numAsInteger Set custom metric to this value
+         */
+        putMetric(counter, numAsInteger) {
+          if (isValidMetricName(counter, this.name)) {
+            this.counters[counter] = convertMetricValueToInteger(numAsInteger ?? 0);
+          } else {
+            throw ERROR_FACTORY4.create("invalid custom metric name", {
+              customMetricName: counter
+            });
+          }
+        }
+        /**
+         * Returns the value of the custom metric by that name. If a custom metric with that name does
+         * not exist will return zero.
+         * @param counter
+         */
+        getMetric(counter) {
+          return this.counters[counter] || 0;
+        }
+        /**
+         * Sets a custom attribute of a trace to a certain value.
+         * @param attr
+         * @param value
+         */
+        putAttribute(attr, value) {
+          const isValidName = isValidCustomAttributeName(attr);
+          const isValidValue = isValidCustomAttributeValue(value);
+          if (isValidName && isValidValue) {
+            this.customAttributes[attr] = value;
+            return;
+          }
+          if (!isValidName) {
+            throw ERROR_FACTORY4.create("invalid attribute name", {
+              attributeName: attr
+            });
+          }
+          if (!isValidValue) {
+            throw ERROR_FACTORY4.create("invalid attribute value", {
+              attributeValue: value
+            });
+          }
+        }
+        /**
+         * Retrieves the value a custom attribute of a trace is set to.
+         * @param attr
+         */
+        getAttribute(attr) {
+          return this.customAttributes[attr];
+        }
+        removeAttribute(attr) {
+          if (this.customAttributes[attr] === void 0) {
+            return;
+          }
+          delete this.customAttributes[attr];
+        }
+        getAttributes() {
+          return { ...this.customAttributes };
+        }
+        setStartTime(startTime) {
+          this.startTimeUs = startTime;
+        }
+        setDuration(duration) {
+          this.durationUs = duration;
+        }
+        /**
+         * Calculates and assigns the duration and start time of the trace using the measure performance
+         * entry.
+         */
+        calculateTraceMetrics() {
+          const perfMeasureEntries = this.api.getEntriesByName(this.traceMeasure);
+          const perfMeasureEntry = perfMeasureEntries && perfMeasureEntries[0];
+          if (perfMeasureEntry) {
+            this.durationUs = Math.floor(perfMeasureEntry.duration * 1e3);
+            this.startTimeUs = Math.floor((perfMeasureEntry.startTime + this.api.getTimeOrigin()) * 1e3);
+          }
+        }
+        /**
+         * @param navigationTimings A single element array which contains the navigationTIming object of
+         * the page load
+         * @param paintTimings A array which contains paintTiming object of the page load
+         * @param firstInputDelay First input delay in millisec
+         */
+        static createOobTrace(performanceController, navigationTimings, paintTimings, webVitalMetrics2, firstInputDelay2) {
+          const route = Api.getInstance().getUrl();
+          if (!route) {
+            return;
+          }
+          const trace2 = new _Trace(performanceController, OOB_TRACE_PAGE_LOAD_PREFIX + route, true);
+          const timeOriginUs = Math.floor(Api.getInstance().getTimeOrigin() * 1e3);
+          trace2.setStartTime(timeOriginUs);
+          if (navigationTimings && navigationTimings[0]) {
+            trace2.setDuration(Math.floor(navigationTimings[0].duration * 1e3));
+            trace2.putMetric("domInteractive", Math.floor(navigationTimings[0].domInteractive * 1e3));
+            trace2.putMetric("domContentLoadedEventEnd", Math.floor(navigationTimings[0].domContentLoadedEventEnd * 1e3));
+            trace2.putMetric("loadEventEnd", Math.floor(navigationTimings[0].loadEventEnd * 1e3));
+          }
+          const FIRST_PAINT = "first-paint";
+          const FIRST_CONTENTFUL_PAINT = "first-contentful-paint";
+          if (paintTimings) {
+            const firstPaint = paintTimings.find((paintObject) => paintObject.name === FIRST_PAINT);
+            if (firstPaint && firstPaint.startTime) {
+              trace2.putMetric(FIRST_PAINT_COUNTER_NAME, Math.floor(firstPaint.startTime * 1e3));
+            }
+            const firstContentfulPaint = paintTimings.find((paintObject) => paintObject.name === FIRST_CONTENTFUL_PAINT);
+            if (firstContentfulPaint && firstContentfulPaint.startTime) {
+              trace2.putMetric(FIRST_CONTENTFUL_PAINT_COUNTER_NAME, Math.floor(firstContentfulPaint.startTime * 1e3));
+            }
+            if (firstInputDelay2) {
+              trace2.putMetric(FIRST_INPUT_DELAY_COUNTER_NAME, Math.floor(firstInputDelay2 * 1e3));
+            }
+          }
+          this.addWebVitalMetric(trace2, LARGEST_CONTENTFUL_PAINT_METRIC_NAME, LARGEST_CONTENTFUL_PAINT_ATTRIBUTE_NAME, webVitalMetrics2.lcp);
+          this.addWebVitalMetric(trace2, CUMULATIVE_LAYOUT_SHIFT_METRIC_NAME, CUMULATIVE_LAYOUT_SHIFT_ATTRIBUTE_NAME, webVitalMetrics2.cls);
+          this.addWebVitalMetric(trace2, INTERACTION_TO_NEXT_PAINT_METRIC_NAME, INTERACTION_TO_NEXT_PAINT_ATTRIBUTE_NAME, webVitalMetrics2.inp);
+          logTrace(trace2);
+          flushLogs();
+        }
+        static addWebVitalMetric(trace2, metricKey, attributeKey, metric) {
+          if (metric) {
+            trace2.putMetric(metricKey, Math.floor(metric.value * 1e3));
+            if (metric.elementAttribution) {
+              if (metric.elementAttribution.length > MAX_ATTRIBUTE_VALUE_LENGTH) {
+                trace2.putAttribute(attributeKey, metric.elementAttribution.substring(0, MAX_ATTRIBUTE_VALUE_LENGTH));
+              } else {
+                trace2.putAttribute(attributeKey, metric.elementAttribution);
+              }
+            }
+          }
+        }
+        static createUserTimingTrace(performanceController, measureName) {
+          const trace2 = new _Trace(performanceController, measureName, false, measureName);
+          logTrace(trace2);
+        }
+      };
+      webVitalMetrics = {};
+      sentPageLoadTrace = false;
+      PerformanceController = class {
+        constructor(app, installations) {
+          this.app = app;
+          this.installations = installations;
+          this.initialized = false;
+        }
+        /**
+         * This method *must* be called internally as part of creating a
+         * PerformanceController instance.
+         *
+         * Currently it's not possible to pass the settings object through the
+         * constructor using Components, so this method exists to be called with the
+         * desired settings, to ensure nothing is collected without the user's
+         * consent.
+         */
+        _init(settings) {
+          if (this.initialized) {
+            return;
+          }
+          if (settings?.dataCollectionEnabled !== void 0) {
+            this.dataCollectionEnabled = settings.dataCollectionEnabled;
+          }
+          if (settings?.instrumentationEnabled !== void 0) {
+            this.instrumentationEnabled = settings.instrumentationEnabled;
+          }
+          if (Api.getInstance().requiredApisAvailable()) {
+            validateIndexedDBOpenable().then((isAvailable) => {
+              if (isAvailable) {
+                setupTransportService();
+                getInitializationPromise(this).then(() => setupOobResources(this), () => setupOobResources(this));
+                this.initialized = true;
+              }
+            }).catch((error) => {
+              consoleLogger.info(`Environment doesn't support IndexedDB: ${error}`);
+            });
+          } else {
+            consoleLogger.info('Firebase Performance cannot start if the browser does not support "Fetch" and "Promise", or cookies are disabled.');
+          }
+        }
+        set instrumentationEnabled(val) {
+          SettingsService.getInstance().instrumentationEnabled = val;
+        }
+        get instrumentationEnabled() {
+          return SettingsService.getInstance().instrumentationEnabled;
+        }
+        set dataCollectionEnabled(val) {
+          SettingsService.getInstance().dataCollectionEnabled = val;
+        }
+        get dataCollectionEnabled() {
+          return SettingsService.getInstance().dataCollectionEnabled;
+        }
+      };
+      DEFAULT_ENTRY_NAME3 = "[DEFAULT]";
+      factory2 = (container, { options: settings }) => {
+        const app = container.getProvider("app").getImmediate();
+        const installations = container.getProvider("installations-internal").getImmediate();
+        if (app.name !== DEFAULT_ENTRY_NAME3) {
+          throw ERROR_FACTORY4.create(
+            "FB not default"
+            /* ErrorCode.FB_NOT_DEFAULT */
+          );
+        }
+        if (typeof window === "undefined") {
+          throw ERROR_FACTORY4.create(
+            "no window"
+            /* ErrorCode.NO_WINDOW */
+          );
+        }
+        setupApi(window);
+        const perfInstance = new PerformanceController(app, installations);
+        perfInstance._init(settings);
+        return perfInstance;
+      };
+      registerPerformance();
+    }
+  });
+
+  // node_modules/firebase/performance/dist/esm/index.esm.js
+  var init_index_esm9 = __esm({
+    "node_modules/firebase/performance/dist/esm/index.esm.js"() {
+      init_index_esm8();
+    }
+  });
+
+  // node_modules/@capacitor-firebase/performance/dist/esm/web.js
+  var web_exports4 = {};
+  __export(web_exports4, {
+    FirebasePerformanceWeb: () => FirebasePerformanceWeb
+  });
+  var FirebasePerformanceWeb;
+  var init_web4 = __esm({
+    "node_modules/@capacitor-firebase/performance/dist/esm/web.js"() {
+      init_dist();
+      init_index_esm9();
+      FirebasePerformanceWeb = class _FirebasePerformanceWeb extends WebPlugin {
+        constructor() {
+          super(...arguments);
+          this.traces = {};
+        }
+        async startTrace(options) {
+          const perf = getPerformance();
+          const trace2 = trace(perf, options.traceName);
+          trace2.start();
+          this.traces[options.traceName] = trace2;
+        }
+        async stopTrace(options) {
+          const trace2 = this.traces[options.traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          trace2.stop();
+          delete this.traces[options.traceName];
+        }
+        async incrementMetric(options) {
+          const trace2 = this.traces[options.traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          trace2.incrementMetric(options.metricName, options.incrementBy);
+        }
+        async setEnabled(options) {
+          const perf = getPerformance();
+          perf.instrumentationEnabled = options.enabled;
+          perf.dataCollectionEnabled = options.enabled;
+        }
+        async isEnabled() {
+          const perf = getPerformance();
+          const result = {
+            enabled: perf.instrumentationEnabled || perf.dataCollectionEnabled
+          };
+          return result;
+        }
+        async putAttribute({ traceName, attribute, value }) {
+          const trace2 = this.traces[traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          trace2.putAttribute(attribute, value);
+          return;
+        }
+        async getAttribute({ traceName, attribute }) {
+          var _a;
+          const trace2 = this.traces[traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          return { value: (_a = trace2.getAttribute(attribute)) !== null && _a !== void 0 ? _a : null };
+        }
+        async getAttributes({ traceName }) {
+          const trace2 = this.traces[traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          return { attributes: trace2.getAttributes() };
+        }
+        async removeAttribute({ traceName, attribute }) {
+          const trace2 = this.traces[traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          trace2.removeAttribute(attribute);
+        }
+        async putMetric({ traceName, metricName, num }) {
+          const trace2 = this.traces[traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          trace2.putMetric(metricName, num);
+        }
+        async getMetric({ traceName, metricName }) {
+          const trace2 = this.traces[traceName];
+          if (!trace2) {
+            throw new Error(_FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND);
+          }
+          return { value: trace2.getMetric(metricName) };
+        }
+        async record({ traceName, startTime, duration, options }) {
+          const perf = getPerformance();
+          const trace2 = trace(perf, traceName);
+          trace2.record(startTime, duration, options);
+        }
+      };
+      FirebasePerformanceWeb.ERROR_TRACE_NOT_FOUND = "No trace was found with the provided traceName.";
+    }
+  });
+
   // node_modules/@capacitor-community/admob/dist/esm/index.js
   init_dist();
 
@@ -3829,18 +5516,37 @@
 
   // node_modules/@capacitor-community/admob/dist/esm/index.js
   var AdMob = registerPlugin("AdMob", {
-    web: () => Promise.resolve().then(() => (init_web(), web_exports)).then((m) => new m.AdMobWeb())
+    web: () => Promise.resolve().then(() => (init_web(), web_exports)).then((m2) => new m2.AdMobWeb())
   });
 
   // node_modules/@capacitor-firebase/analytics/dist/esm/index.js
   init_dist();
   init_definitions();
   var FirebaseAnalytics = registerPlugin("FirebaseAnalytics", {
-    web: () => Promise.resolve().then(() => (init_web2(), web_exports2)).then((m) => new m.FirebaseAnalyticsWeb())
+    web: () => Promise.resolve().then(() => (init_web2(), web_exports2)).then((m2) => new m2.FirebaseAnalyticsWeb())
+  });
+
+  // node_modules/@capacitor-firebase/crashlytics/dist/esm/index.js
+  init_dist();
+  var FirebaseCrashlytics = registerPlugin("FirebaseCrashlytics", {
+    web: () => Promise.resolve().then(() => (init_web3(), web_exports3)).then((m2) => new m2.FirebaseCrashlyticsWeb())
+  });
+
+  // node_modules/@capacitor-firebase/performance/dist/esm/index.js
+  init_dist();
+  var FirebasePerformance = registerPlugin("FirebasePerformance", {
+    web: () => Promise.resolve().then(() => (init_web4(), web_exports4)).then((m2) => new m2.FirebasePerformanceWeb())
   });
 
   // native-bridge/src/index.js
-  window.SL_NATIVE = { AdMob, BannerAdSize, BannerAdPosition, FirebaseAnalytics };
+  window.SL_NATIVE = {
+    AdMob,
+    BannerAdSize,
+    BannerAdPosition,
+    FirebaseAnalytics,
+    FirebaseCrashlytics,
+    FirebasePerformance
+  };
 })();
 /*! Bundled license information:
 
@@ -4052,6 +5758,40 @@
   (**
    * @license
    * Copyright 2020 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
+
+@firebase/performance/dist/esm/index.esm.js:
+  (**
+   * @license
+   * Copyright 2020 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
+  (**
+   * @license
+   * Copyright 2019 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.

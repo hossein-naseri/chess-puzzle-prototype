@@ -9,6 +9,14 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.0'
         classpath 'com.google.gms:google-services:4.4.4'
+        // Uploads crash symbol/mapping info at build time; the plugin's own
+        // module below already ships the firebase-crashlytics SDK dependency,
+        // but not this Gradle plugin - it has to be applied at the app module.
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.2'
+        // Instruments the build for Performance Monitoring's automatic traces
+        // (app start, network requests) in addition to the manual startTrace/
+        // stopTrace calls the SDK dependency alone would still support.
+        classpath 'com.google.firebase:perf-plugin:1.4.2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
